@@ -1,4 +1,5 @@
-import { mkdir, copyFile, readdir, rm } from 'node:fs/promises';
+import { mkdir, copyFile, readdir, rm, readFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 import { resolve, dirname, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -25,4 +26,17 @@ async function copyAssets(source, target) {
   }
 }
 await copyAssets(resolve(root, 'assets'), resolve(output, 'assets'));
+// A changed script or stylesheet gets a new URL in the same deployment.
+// This prevents cached catalogue code from restoring the old anchor navigation.
+for (const name of [...files.filter(name => name.endsWith('.html')), 'admin/index.html']) {
+  let html = await readFile(resolve(output, name), 'utf8');
+  const references = [...html.matchAll(/(?:src|href)="([^"?]+\.(?:js|css))(?:\?[^\"]*)?"/g)];
+  for (const match of references) {
+    if (/^(?:https?:)?\/\//.test(match[1])) continue;
+    const asset = match[1].startsWith('/') ? resolve(output, '.' + match[1]) : resolve(dirname(resolve(output, name)), match[1]);
+    const hash = createHash('sha256').update(await readFile(asset)).digest('hex').slice(0, 12);
+    html = html.replace(match[0], match[0].slice(0, match[0].indexOf('"') + 1) + match[1] + '?v=' + hash + '"');
+  }
+  await writeFile(resolve(output, name), html);
+}
 console.log('Built dist/ for Cloudflare Pages. Functions remain in functions/ and are deployed by Wrangler.');

@@ -72,9 +72,9 @@ test('static deployment contains expected frontend files without server source o
   assert.deepEqual((await readdir(new URL('admin/',root))).sort(),['admin.css','admin.js','index.html']);
   const products=await readFile(new URL('products.html',root),'utf8');
   assert.ok(!products.includes('data-name="Soft Sand"'));
-  assert.ok(products.includes('src="catalogue.js"'));
+  assert.match(products, /src="catalogue\.js\?v=[a-f0-9]{12}"/);
   const gallery=await readFile(new URL('gallery.html',root),'utf8');
-  assert.ok(gallery.includes('id="gallery-grid"')); assert.ok(gallery.includes('src="gallery.js"'));
+  assert.ok(gallery.includes('id="gallery-grid"')); assert.match(gallery, /src="gallery\.js\?v=[a-f0-9]{12}"/);
   const routes=JSON.parse(await readFile(new URL('_routes.json',root),'utf8'));
   assert.deepEqual(routes.include,['/api/*','/media/*','/admin','/admin/*']);
 });
