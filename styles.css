@@ -201,3 +201,6 @@ body:has(> .fcc){margin:0}
 /* Dynamic CMS content retains the existing catalogue and gallery layout. */
 .fcc .fcc-cms-product-image{height:260px;width:100%;object-fit:cover}.fcc-cms-no-image{height:260px;display:grid;place-items:center;background:#eee5e2;color:#71585d;font-size:14px}.fcc-cms-description{white-space:pre-wrap;overflow-wrap:anywhere}.fcc-cms-price{margin-top:12px!important;font-weight:600}#gallery-grid figcaption{flex-direction:column;gap:6px}#gallery-grid figcaption span{white-space:pre-wrap;overflow-wrap:anywhere}#gallery-status{margin-bottom:24px}#gallery-more{margin-top:30px}@media(max-width:680px){.fcc .fcc-cms-product-image,.fcc-cms-no-image{height:190px}}
 
+
+/* Category updates must not anchor the viewport to moving cards or the footer. */
+html.fcc-catalogue-page{overflow-anchor:none}
