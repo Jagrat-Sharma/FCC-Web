@@ -12,7 +12,7 @@ ADMIN_EMAILS = "REPLACE-WITH-APPROVED-EMAILS"
 [[d1_databases]]
 binding = "DB"
 database_name = "fcc-cms"
-database_id = "REPLACE-WITH-D1-DATABASE-ID"
+database_id = "9643a664-128b-4fd3-8936-939b1fb4830d"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
