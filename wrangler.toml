@@ -1,0 +1,37 @@
+name = "fcc-website"
+compatibility_date = "2026-09-22"
+pages_build_output_dir = "./dist"
+
+# Replace these values before deployment. None is a password.
+[vars]
+PUBLIC_ORIGIN = "https://REPLACE-WITH-YOUR-DOMAIN.example"
+ACCESS_TEAM_DOMAIN = "https://REPLACE-WITH-YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE-WITH-ACCESS-APPLICATION-AUD"
+ADMIN_EMAILS = "REPLACE-WITH-APPROVED-EMAILS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "fcc-cms"
+database_id = "REPLACE-WITH-D1-DATABASE-ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "IMAGES"
+bucket_name = "fcc-images"
+
+# Configure preview deployments separately. Never bind them to production data.
+[env.preview.vars]
+PUBLIC_ORIGIN = "https://REPLACE-WITH-STAGING-DOMAIN.example"
+ACCESS_TEAM_DOMAIN = "https://REPLACE-WITH-YOUR-TEAM.cloudflareaccess.com"
+ACCESS_AUD = "REPLACE-WITH-STAGING-ACCESS-AUD"
+ADMIN_EMAILS = "REPLACE-WITH-APPROVED-EMAILS"
+
+[[env.preview.d1_databases]]
+binding = "DB"
+database_name = "fcc-cms-preview"
+database_id = "REPLACE-WITH-PREVIEW-D1-ID"
+migrations_dir = "migrations"
+
+[[env.preview.r2_buckets]]
+binding = "IMAGES"
+bucket_name = "fcc-images-preview"

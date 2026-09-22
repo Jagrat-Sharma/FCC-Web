@@ -1,0 +1,15 @@
+{
+  "name": "first-choice-carpets",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tools/build.mjs",
+    "test": "node tools/build.mjs && node --test tests/*.test.mjs",
+    "dev": "npm run build && wrangler pages dev dist",
+    "deploy": "npm run build && wrangler pages deploy dist",
+    "db:local": "wrangler d1 migrations apply DB --local",
+    "db:remote": "wrangler d1 migrations apply DB --remote"
+  },
+  "devDependencies": { "wrangler": "^4.0.0" },
+  "engines": { "node": ">=22.13" }
+}

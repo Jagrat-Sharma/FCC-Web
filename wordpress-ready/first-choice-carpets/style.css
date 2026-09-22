@@ -1,0 +1,40 @@
+/*
+Theme Name: First Choice Carpets
+Description: Burgundy flooring catalogue theme for First Choice Carpets, with WooCommerce support.
+Version: 1.0.0
+Requires at least: 6.4
+Requires PHP: 7.4
+Text Domain: first-choice-carpets
+*/
+body{margin:0}
+.fcc .custom-logo-link{display:block;flex-shrink:0}
+.fcc .custom-logo{width:260px;height:auto;object-fit:contain}
+.fcc .fcc-attribute-link{display:block;font-size:13px;padding:7px 0;text-decoration:underline;text-underline-offset:3px}
+.fcc-wc-layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;align-items:start}
+.fcc-wc-results{min-width:0}
+.fcc-wc aside>a{display:block;padding:10px;font-size:14px}
+.fcc-wc aside>a[aria-current]{background:var(--green);color:white;border-radius:4px}
+.fcc-wc aside h2{font:600 18px Arial,sans-serif;letter-spacing:0;margin:24px 0 12px}
+.fcc-wc .woocommerce-product-search label{display:block;font-size:13px;margin-bottom:10px}
+.fcc-wc .woocommerce-product-search button{margin-top:10px}
+.fcc-wc ul.products{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;clear:both}
+.fcc-wc ul.products::before,.fcc-wc ul.products::after{display:none!important}
+.fcc-wc ul.products li.product{float:none!important;width:auto!important;margin:0!important;padding:0 0 22px;background:white;border:1px solid var(--line);border-radius:5px;overflow:hidden;text-align:center}
+.fcc-wc ul.products li.product img{width:100%;height:260px;object-fit:cover}
+.fcc-wc ul.products li.product h2{font:500 21px/1.3 Arial,sans-serif;letter-spacing:-.02em;padding:12px 15px!important}
+.fcc-wc .button,.fcc-wc button,.fcc-wc a.button{background:var(--green)!important;color:white!important;border:0;border-radius:3px;padding:13px 18px;font-size:13px;cursor:pointer}
+.fcc-wc .woocommerce-products-header h1{font-size:48px;margin-bottom:28px}
+.fcc-wc select{width:auto;max-width:100%}
+.fcc-wc .woocommerce-result-count{font-size:13px}
+.fcc-wc div.product .product_title{font-size:44px;margin-bottom:22px}
+.fcc-wc div.product .woocommerce-product-gallery img{height:auto}
+.fcc-wc div.product .woocommerce-tabs{padding-top:35px}
+.fcc-wc .woocommerce-tabs h2,.fcc-wc .related h2{font-size:30px;margin:20px 0}
+.fcc-wc .woocommerce-breadcrumb{font-size:13px;margin-bottom:25px}
+.fcc-wc .woocommerce-pagination{margin-top:30px}
+.fcc-wc .woocommerce-pagination .current{background:var(--green)!important;color:white!important}
+.fcc-category-list:empty{min-height:0;padding:0}
+.fcc-category-list{max-height:440px;overflow-y:auto}
+@media(max-width:1100px){.fcc-wc ul.products{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:680px){.fcc-wc-layout{grid-template-columns:1fr}.fcc-wc .woocommerce-products-header h1{font-size:38px}.fcc-wc ul.products li.product img{height:200px}.fcc .custom-logo{width:220px}}
+@media(max-width:400px){.fcc-wc ul.products{grid-template-columns:1fr}}
