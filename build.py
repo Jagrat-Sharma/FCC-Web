@@ -7,7 +7,7 @@ parser.add_argument('--logo-url', help='Uploaded logo URL from WordPress Media L
 args = parser.parse_args()
 base = args.base_url.rstrip('/') + '/'
 root = Path(__file__).resolve().parent
-routes = {'index.html':'', 'products.html':'products/', 'about.html':'about/', 'gallery.html':'gallery/', 'contact.html':'contact/'}
+routes = {'index.html':'', 'products.html':'products/', 'about.html':'about/', 'gallery.html':'gallery/', 'contact.html':'contact/', 'faq.html':'faq/'}
 output = root / 'wordpress'
 output.mkdir(exist_ok=True)
 for filename in routes:
@@ -22,4 +22,4 @@ for filename in routes:
   content = content.replace(f'href="{local}#', f'href="{base}{route}#')
  (output / filename).write_text(content + '\n', encoding='utf-8')
  if filename == 'index.html': (root / 'wordpress-content.html').write_text(content + '\n', encoding='utf-8')
-print('Updated all five WordPress snippets.')
+print('Updated all six WordPress snippets.')

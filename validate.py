@@ -20,8 +20,8 @@ class Check(HTMLParser):
         if tag == 'h1': self.headings += 1
 
 root = Path(__file__).resolve().parent
-names = ['index.html', 'products.html', 'about.html', 'gallery.html', 'contact.html']
-routes = dict(zip(names, ['/', '/products/', '/about/', '/gallery/', '/contact/']))
+names = ['index.html', 'products.html', 'about.html', 'gallery.html', 'contact.html', 'faq.html']
+routes = dict(zip(names, ['/', '/products/', '/about/', '/gallery/', '/contact/', '/faq/']))
 for name in names + ['wordpress/' + n for n in names]:
     parser = Check()
     parser.feed((root / name).read_text(encoding='utf-8'))
