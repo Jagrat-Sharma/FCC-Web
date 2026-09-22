@@ -4,15 +4,15 @@ pages_build_output_dir = "./dist"
 
 # Replace these values before deployment. None is a password.
 [vars]
-PUBLIC_ORIGIN = "https://REPLACE-WITH-YOUR-DOMAIN.example"
-ACCESS_TEAM_DOMAIN = "https://REPLACE-WITH-YOUR-TEAM.cloudflareaccess.com"
-ACCESS_AUD = "REPLACE-WITH-ACCESS-APPLICATION-AUD"
-ADMIN_EMAILS = "REPLACE-WITH-APPROVED-EMAILS"
+PUBLIC_ORIGIN = "https://jagratsharma.com"
+ACCESS_TEAM_DOMAIN = "https://icy-king-9dd1.cloudflareaccess.com"
+ACCESS_AUD = "2e0b5aa6f8137d3951230aab169a23c534986e9b7aaa24ff7fb8d07a2e60c2a1"
+ADMIN_EMAILS = "sharmajagrat25@gmai.com"
 
 [[d1_databases]]
 binding = "DB"
 database_name = "fcc-cms"
-database_id = "REPLACE-WITH-D1-DATABASE-ID"
+database_id = "9643a664-128b-4fd3-8936-939b1fb4830d"
 migrations_dir = "migrations"
 
 [[r2_buckets]]
