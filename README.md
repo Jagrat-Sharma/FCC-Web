@@ -2,6 +2,8 @@
 
 ## Active working folder and Products dropdown
 
+The supplied logo is saved at `assets/first-choice-logo.png`. For WordPress, upload it to Media Library and run `python build.py --logo-url "YOUR_UPLOADED_LOGO_URL"` before pasting the regenerated snippets. The embedded location maps require an internet connection and WordPress permission to retain iframe markup. If the editor removes the map, use a supported map block and the provided directions link. The address is in Brampton; the stated service area is Toronto. The user supplied the “Since 1991” family-business description and the two slogans.
+
 Homepage decorative icons use Lucide SVGs (lucide-static 0.468.0) hosted by jsDelivr through CSS masks. They inherit the surrounding text colour and need an internet connection. Text labels remain readable if the icons cannot load. Source: https://lucide.dev/icons/ — licensing: https://lucide.dev/license. This replaces the homepage's Unicode arrow, chevron, house, sparkle and decorative quotation symbols. Normal text punctuation is unchanged.
 
 Products now contains a sample catalogue with 12 illustrative swatches, search, eight category filters, sorting, a 6/12 page-size selector, pagination and expandable product details. Edit the article content and data-name/data-category/data-label attributes in products.html to maintain the sample catalogue. Replace illustrations and sample names with the real product catalogue before launch.

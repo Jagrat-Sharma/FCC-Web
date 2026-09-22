@@ -33,6 +33,11 @@ for name in names + ['wordpress/' + n for n in names]:
     expected = routes[Path(name).name] if wordpress else name
     assert parser.active == ([] if Path(name).name == 'index.html' else [expected]), 'Incorrect current page'
     for link in parser.pages:
+        if link.startswith('https://www.google.com/maps/search/?'):
+            continue
+        if link.startswith(('tel:', 'mailto:')):
+            assert link.split(':', 1)[1], 'Empty contact link'
+            continue
         destination, _, fragment = link.partition('#')
         if wordpress:
             assert destination in routes.values(), 'Broken WordPress page link'
