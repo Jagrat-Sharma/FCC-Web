@@ -20,7 +20,7 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
       : { opacity: '0', transform: 'translateY(-10px)' };
     if (animation) { animation.cancel(); animation = null; }
     menu.open = true; // Keep the disclosure rendered until its exit finishes.
-    if (!next && panel.contains(document.activeElement)) trigger.focus();
+    if (!next && panel.contains(document.activeElement)) trigger.focus({ preventScroll: true });
     panel.inert = !next;
     trigger.setAttribute('aria-expanded', String(next));
     menu.classList.toggle('fcc-menu-expanded', next);
@@ -120,7 +120,7 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
     if (event.key === 'Escape' && expanded) {
       setExpanded(false);
       openedByHover = false;
-      trigger.focus();
+      trigger.focus({ preventScroll: true });
       event.preventDefault();
     }
   });

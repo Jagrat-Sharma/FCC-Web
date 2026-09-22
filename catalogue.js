@@ -7,14 +7,16 @@
   async function json(url, signal) { const r = await fetch(url, { signal }); if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) throw new Error('Products are temporarily unavailable. Please try again or contact us.'); return r.json(); }
   async function load() {
     controller?.abort(); controller = new AbortController(); const signal = controller.signal;
+    // Keep the document height stable while a new result set loads.
+    grid.style.minHeight = grid.getBoundingClientRect().height + 'px';
     grid.replaceChildren(); grid.setAttribute('aria-busy', 'true'); $('fcc-product-count').textContent = 'Loading products…'; $('fcc-load-error').hidden = $('fcc-retry').hidden = $('fcc-no-products').hidden = $('fcc-pagination').hidden = true;
     try {
       if (!categoriesReady) {
         const data = await json('/api/categories', signal); const box = document.querySelector('.fcc-category-buttons'); box.replaceChildren();
-        for (const category of [{ slug: 'all', name: 'All products' }, ...data.items]) { const b = element('button', category.name); b.type = 'button'; b.dataset.category = category.slug; b.id = 'fcc-' + category.slug; b.onclick = () => { if (location.hash === '#fcc-' + category.slug) { page = 1; load(); } else location.hash = 'fcc-' + category.slug; }; box.append(b); }
+        for (const category of [{ slug: 'all', name: 'All products' }, ...data.items]) { const b = element('button', category.name); b.type = 'button'; b.dataset.category = category.slug; b.id = 'filter-' + category.slug; b.onclick = () => { const url = new URL(location.href); url.hash = ''; if (category.slug === 'all') url.searchParams.delete('category'); else url.searchParams.set('category', category.slug); history.pushState(null, '', url); page = 1; load(); }; box.append(b); }
         categoriesReady = true; [search,sort,size,$('fcc-reset-filters')].forEach(e => e.disabled = false);
       }
-      const requestedCategory = location.hash.replace(/^#fcc-/, '');
+      const requestedCategory = new URLSearchParams(location.search).get('category') || '';
       const category = [...document.querySelectorAll('button[data-category]')].some(b => b.dataset.category === requestedCategory) ? requestedCategory : 'all';
       document.querySelectorAll('button[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
       const data = await json('/api/products?' + new URLSearchParams({ page, limit: size.value, q: search.value, sort: sort.value, ...(category !== 'all' ? { category } : {}) }), signal);
@@ -31,12 +33,16 @@
       $('fcc-product-count').textContent = data.total ? `Showing ${(page - 1) * data.limit + 1}–${(page - 1) * data.limit + data.items.length} of ${data.total} products` : 'No products found';
       $('fcc-no-products').hidden = data.items.length > 0; $('fcc-pagination').hidden = data.total <= data.limit; $('fcc-page-label').textContent = `Page ${page} of ${Math.max(1, Math.ceil(data.total / data.limit))}`; $('fcc-previous').disabled = page <= 1; $('fcc-next').disabled = page * data.limit >= data.total;
     } catch (e) { if (e.name === 'AbortError') return; $('fcc-product-count').textContent = ''; $('fcc-load-error').textContent = e.message; $('fcc-load-error').hidden = $('fcc-retry').hidden = false; }
-    finally { if (!signal.aborted) grid.setAttribute('aria-busy', 'false'); }
+    finally { if (!signal.aborted) { grid.setAttribute('aria-busy', 'false'); grid.style.minHeight = ''; } }
   }
   let timer; search.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(() => { page = 1; load(); }, 300); });
   [sort,size].forEach(e => e.addEventListener('change', () => { page = 1; load(); }));
-  addEventListener('hashchange', () => { page = 1; load(); });
+  addEventListener('popstate', () => { page = 1; load(); });
   $('fcc-reset-filters').onclick = () => { search.value = ''; sort.value = 'featured'; page = 1; history.replaceState(null, '', location.pathname); load(); };
   $('fcc-previous').onclick = () => { page--; load(); }; $('fcc-next').onclick = () => { page++; load(); }; $('fcc-retry').onclick = load;
+  // Old category bookmarks become filters, not scroll targets.
+  if (location.hash.startsWith('#fcc-') && location.hash !== '#fcc-home') {
+    const url = new URL(location.href); url.searchParams.set('category', location.hash.slice(5)); url.hash = ''; history.replaceState(null, '', url);
+  }
   load();
 })();

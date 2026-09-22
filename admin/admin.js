@@ -20,7 +20,7 @@ function edit(item = null) {
   $('product-fields').hidden = kind !== 'products'; field('category_id').disabled = kind !== 'products'; $('order-field').hidden = kind !== 'gallery';
   field('name').value = item?.name || item?.title || ''; field('description').value = item?.description || '';
   field('image_alt').value = item?.image_alt || ''; field('published').checked = item?.published || false;
-  if (kind === 'products') { if (item) field('category_id').value = item.category_id; field('price').value = item?.price_cents == null ? '' : (item.price_cents / 100).toFixed(2); field('price_unit').value = item?.price_unit || ''; field('featured').checked = item?.featured || false; }
+  if (kind === 'products') { if (item) field('category_id').value = item.category_id; field('featured').checked = item?.featured || false; }
   field('sort_order').value = item?.sort_order || 0; preview(); $('editor').showModal(); field('name').focus();
 }
 async function list() {
@@ -33,7 +33,7 @@ async function list() {
     for (const item of data.items) {
       const card = node('article', undefined, 'card');
       if (item.image_id || kind === 'media') { const img = node('img'); img.src = '/api/admin/media/' + (item.image_id || item.id) + '/file'; img.alt = item.image_alt || ''; img.loading = 'lazy'; card.append(img); }
-      card.append(node('h3', item.name || item.title || item.filename), node('p', kind === 'media' ? `${item.references_count} references · ${Math.ceil(item.size_bytes / 1024)} KB` : `${item.published ? 'Published' : 'Draft'}${item.featured ? ' · Featured' : ''}`));
+      card.append(node('h3', item.name || item.title || item.filename), node('p', kind === 'media' ? `${item.references_count} references · ${Math.ceil(item.size_bytes / 1024)} KB` : `${item.published ? 'Visible on website' : 'Hidden from website'}${item.featured ? ' · Featured' : ''}`));
       const actions = node('div', undefined, 'actions');
       if (kind !== 'media') { const button = node('button', 'Edit'); button.onclick = () => edit(item); actions.append(button); }
       const del = node('button', 'Delete', 'secondary'); del.disabled = kind === 'media' && item.references_count > 0;
@@ -69,7 +69,7 @@ form.onsubmit = async e => {
   e.preventDefault(); if (busy) return;
   if (kind === 'gallery' && !imageId) { $('form-status').textContent = 'Upload an image for this gallery item.'; return; }
   const data = { description: field('description').value, image_id: imageId, image_alt: field('image_alt').value, published: field('published').checked, ...(current ? { version: current.version } : {}) };
-  if (kind === 'products') Object.assign(data, { name: field('name').value, category_id: field('category_id').value, price_cents: field('price').value === '' ? null : Math.round(Number(field('price').value) * 100), price_unit: field('price_unit').value, featured: field('featured').checked });
+  if (kind === 'products') Object.assign(data, { name: field('name').value, category_id: field('category_id').value, price_cents: current?.price_cents ?? null, price_unit: current?.price_unit ?? '', featured: field('featured').checked });
   else Object.assign(data, { title: field('name').value, sort_order: Number(field('sort_order').value) });
   lock(true); $('form-status').textContent = 'Saving…';
   try { await write(kind + (current ? '/' + current.id : ''), current ? 'PUT' : 'POST', data); $('editor').close(); $('notice').textContent = data.published ? 'Saved and published on the website.' : 'Draft saved. It is not visible on the website.'; await list(); }

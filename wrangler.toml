@@ -7,7 +7,7 @@ pages_build_output_dir = "./dist"
 PUBLIC_ORIGIN = "https://jagratsharma.com"
 ACCESS_TEAM_DOMAIN = "https://icy-king-9dd1.cloudflareaccess.com"
 ACCESS_AUD = "2e0b5aa6f8137d3951230aab169a23c534986e9b7aaa24ff7fb8d07a2e60c2a1"
-ADMIN_EMAILS = "sharmajagrat25@gmai.com"
+ADMIN_EMAILS = "sharmajagrat25@gmail.com"
 
 [[d1_databases]]
 binding = "DB"

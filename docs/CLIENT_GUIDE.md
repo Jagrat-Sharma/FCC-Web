@@ -10,17 +10,17 @@ Open the admin link and sign in through Cloudflare Access with your approved ema
 
 1. Choose **Products → Add product**.
 2. Enter its name, select a category, and add a plain-text description.
-3. Optionally enter a CAD price and choose its unit. Leave the price blank for an enquiry-only product; entering zero displays a zero price.
+3. Product entry does not require pricing. New products are enquiry-only.
 4. Choose **Featured product** if it should appear first in the default catalogue order.
 5. Upload a JPEG, PNG or WebP image. Wait for the upload confirmation. Add a short image description, such as “Natural oak flooring with a matte finish.”
-6. Check **Publish on the website** when ready, or leave it unchecked to save a private draft.
+6. Check **Display on website** when ready, or leave it unchecked to save a private draft.
 7. Choose **Save changes**. Open the website to verify the product. No rebuild or deployment is needed for content changes.
 
 The image is optimized automatically; source files must be under 20 MB. A product can be saved without an image, but a gallery item needs one. The website displays “Image coming soon” for products without an image.
 
 ## Change or remove a product
 
-Find the product using search and choose **Edit**. You can change text, category, price, featured status, image, and publication status. Save when finished. Unchecking Publish hides it from the public website while retaining it in your dashboard.
+Find the product using search and choose **Edit**. You can change text, category, featured status, image, and publication status. Save when finished. Turning off Display on website hides it from the public website while retaining it in your dashboard.
 
 Choose **Delete** and confirm only when you want to remove the record permanently. To keep it for later, unpublish it instead. Deleting the record does not automatically remove its image file.
 
