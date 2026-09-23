@@ -521,12 +521,6 @@ body:has(> .fcc) {
   font-size:10px;
   color:#f0d9dc
 }
-@media(min-width:1600px) {
-  .fcc {
-    max-width:1800px;
-    margin:auto
-  }
-}
 @media(max-width:1000px) {
   .fcc-header {
     padding:22px 5%
@@ -2067,4 +2061,108 @@ html.fcc-popup-open {
   .fcc-header nav {
     justify-content:flex-start
   }
+}
+
+/* Contained homepage story panel, with photography alongside the introduction. */
+.fcc-page-links-pair {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.fcc-home-about {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 88%;
+  max-width: 1320px;
+  margin: 24px auto 85px;
+  background: #f3e5e4;
+  border: 1px solid var(--line);
+}
+.fcc-home-about-image {
+  min-height: 440px;
+}
+.fcc-home-about-image img {
+  height: 100%;
+  object-fit: cover;
+}
+.fcc-home-about-copy {
+  align-self: center;
+  padding: clamp(28px, 4vw, 56px);
+}
+.fcc-home-about-copy h2 {
+  font-size: clamp(30px, 3vw, 44px);
+  line-height: 1.15;
+  margin-bottom: 24px;
+}
+.fcc-home-about-copy p:not(.fcc-eyebrow) {
+  max-width: 65ch;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.8;
+}
+.fcc-home-about-copy p + p {
+  margin-top: 16px;
+}
+.fcc-home-about-copy .fcc-button {
+  margin-top: 28px;
+}
+@media (max-width: 800px) {
+  .fcc-home-about {
+    grid-template-columns: 1fr;
+    margin-bottom: 55px;
+  }
+  .fcc-home-about-image {
+    min-height: 0;
+    aspect-ratio: 4 / 3;
+  }
+}
+@media (max-width: 680px) {
+  .fcc-page-links-pair {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Live homepage product preview. */
+.fcc-home-products {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+.fcc-home-product {
+  border: 1px solid var(--line);
+  background: #eeece2;
+  transition: background 180ms ease;
+}
+.fcc-home-product:hover {
+  background: #f3e5e4;
+}
+.fcc-home-product img,
+.fcc-home-product-placeholder {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+.fcc-home-product-placeholder {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+.fcc-home-product > div:not(.fcc-home-product-placeholder) {
+  padding: 24px;
+}
+.fcc-home-product p {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+.fcc-home-product h3 {
+  font-size: 20px;
+}
+.fcc-home-products-all {
+  margin-top: 28px;
+}
+@media (max-width: 900px) {
+  .fcc-home-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 540px) {
+  .fcc-home-products { grid-template-columns: 1fr; }
 }

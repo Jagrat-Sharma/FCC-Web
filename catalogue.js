@@ -3,6 +3,7 @@
   if (!grid) return;
   document.documentElement.classList.add('fcc-catalogue-page');
   const search = $('fcc-product-search'), sort = $('fcc-product-sort'), size = $('fcc-page-size');
+  search.value = new URLSearchParams(location.search).get('q') || '';
   let page = 1, controller, categoriesReady = false;
   const element = (tag, text, cls) => {
     const e = document.createElement(tag);

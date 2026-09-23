@@ -6,7 +6,7 @@
     <meta name="description" content="Carpets & Flooring in Brampton — First Choice Carpets, serving Toronto, Ontario.">
     <title>Carpets & Flooring in Brampton | First Choice Carpets</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=fc-mark">
   </head>
   <body>
     <!-- WORDPRESS CONTENT START -->
@@ -182,15 +182,24 @@
               <p class="fcc-eyebrow">EXPLORE FIRST CHOICE</p>
               <h2>Flooring for every part of life.</h2>
             </div>
-            <p>Since 1991, our family-owned and operated business has provided for all of your residential and commercial flooring needs, including the following:</p>
+            <p>Explore our current selection of carpets and flooring, chosen for the spaces you call home.</p>
           </div>
-          <div class="fcc-page-links"><a href="products.html"><span>PRODUCTS</span>
-              <h3>Find your flooring <i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></h3>
-              <p>Explore carpets, wood looks and everyday comfort.</p></a><a href="about.html"><span>ABOUT US</span>
-              <h3>A local first choice <i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></h3>
-              <p>Get to know First Choice Carpets, serving Toronto.</p></a><a href="gallery.html"><span>GALLERY</span>
-              <h3>See the possibilities <i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></h3>
-              <p>Find inspiration for your next project.</p></a>
+          <div id="fcc-home-products" class="fcc-home-products" aria-busy="true"></div>
+          <p id="fcc-home-products-status" role="status">Loading products…</p>
+          <button id="fcc-home-products-retry" class="fcc-button" type="button" hidden>Try again</button>
+          <noscript><p>Enable JavaScript to see our current products.</p></noscript>
+          <a class="fcc-button fcc-home-products-all" href="products.html">Browse all products <i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></a>
+        </section>
+        <section class="fcc-home-about" aria-labelledby="fcc-home-about-title">
+          <div class="fcc-home-about-image">
+            <img src="https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?auto=format&amp;fit=crop&amp;w=1000&amp;q=85" alt="A welcoming living space with soft furnishings and natural textures" width="1000" height="1000" loading="lazy">
+          </div>
+          <div class="fcc-home-about-copy">
+            <p class="fcc-eyebrow">ABOUT FIRST CHOICE</p>
+            <h2 id="fcc-home-about-title">Helping you feel at home.</h2>
+            <p>Family-owned and operated since 1991, First Choice Carpets helps homeowners and businesses find flooring that fits their space, style and everyday life.</p>
+            <p>Explore carpets, rugs, hardwood, laminate and vinyl at our Brampton showroom, serving Toronto and the GTA. From choosing a finish to custom installation, our team is here to help.</p>
+            <a class="fcc-button" href="about.html">More about us <i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></a>
           </div>
         </section>
         <section class="fcc-reviews fcc-section" aria-labelledby="fcc-reviews-title">
@@ -236,6 +245,7 @@
     <!-- WORDPRESS CONTENT END -->
     <script src="navigation.js" defer>
     </script>
+    <script src="home-products.js" defer></script>
     <script src="showcase.js" defer>
     </script>
   </body>
