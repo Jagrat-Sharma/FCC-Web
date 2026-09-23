@@ -39,6 +39,7 @@ const valid = await token();
 function setup() {
   const sql = new DatabaseSync(':memory:');
   sql.exec(readFileSync(new URL('../migrations/0001_initial.sql', import.meta.url), 'utf8'));
+  sql.exec(readFileSync(new URL('../migrations/0002_product_specifications.sql', import.meta.url), 'utf8'));
   const DB = {
     prepare(query) {
       const statement = sql.prepare(query);
@@ -226,7 +227,7 @@ test('static deployment contains expected frontend files without server source o
   const files = await readdir(root);
   for (const file of ['index.html','products.html','gallery.html','catalogue.js','gallery.js','admin','_routes.json','404.html']) assert.ok(files.includes(file),file);
   for (const file of ['server','functions','migrations','wordpress','wordpress-ready','wrangler.toml','.git','.dev.vars','tests','README.md']) assert.ok(!files.includes(file),file);
-  assert.deepEqual((await readdir(new URL('admin/',root))).sort(),['admin.css','admin.js','index.html']);
+  assert.deepEqual((await readdir(new URL('admin/',root))).sort(),['admin.css','admin.js','categories.html','index.html','product.html']);
   const products=await readFile(new URL('products.html',root),'utf8');
   assert.ok(!products.includes('data-name="Soft Sand"'));
   assert.match(products, /src="catalogue\.js\?v=[a-f0-9]{12}"/);
@@ -284,5 +285,39 @@ test('R2 uploads, private draft images, gallery publishing and referenced image 
   assert.equal((await call('/api/admin/media/'+image.id,'DELETE',{
   })).status,200);
   assert.equal(env.objects.size,0);
+  env.sql.close();
+});
+
+test('brand filters and specifications persist safely without exposing draft brands', async () => {
+  const env = setup();
+  const call = (path, method, body) => handleAPI({ env, request: req(path, method, body) });
+  const draft = await call('/api/admin/products', 'POST', { ...product, brand: 'Private supplier' });
+  assert.equal(draft.status, 201);
+  for (const brand of ['Zeta', 'Alpha']) {
+    const response = await call('/api/admin/products', 'POST', {
+      ...product, brand, published: true, specifications: { width: "12 ft", color: '10 colours', material: 'Nylon' }
+    });
+    assert.equal(response.status, 201);
+    const { item } = await response.json();
+    assert.equal(item.specifications.width, '12 ft');
+    const updated = await call('/api/admin/products/' + item.id, 'PUT', {
+      ...item, specifications: { ...item.specifications, length: 'Random' }
+    });
+    assert.equal(updated.status, 200);
+    assert.equal((await updated.json()).item.specifications.length, 'Random');
+  }
+  const brands = (await (await call('/api/brands')).json()).items.map(item => item.name);
+  assert.deepEqual(brands, ['Alpha', 'Zeta']);
+  const sorted = (await (await call('/api/products?sort=brand')).json()).items;
+  assert.deepEqual(sorted.map(item => item.brand), ['Alpha', 'Zeta']);
+  assert.equal((await (await call('/api/products?brand=alpha')).json()).total, 1);
+  assert.equal((await (await call('/api/products?brand=Alpha&brand=Zeta')).json()).total, 2);
+  assert.equal((await (await call('/api/products?brand=Private%20supplier')).json()).total, 0);
+  for (const extra of [{ brand: '<script>' }, { specifications: [] }, { specifications: { width: 'x'.repeat(181) } }, { specifications: { unexpected: 'test' } }]) {
+    assert.equal((await call('/api/admin/products', 'POST', { ...product, ...extra })).status, 400);
+  }
+  for (const path of ['/admin/product.html', '/admin/categories.html']) {
+    assert.equal((await handleAdmin({ env, request: req(path, 'GET', undefined, null) })).status, 401);
+  }
   env.sql.close();
 });

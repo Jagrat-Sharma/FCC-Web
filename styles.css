@@ -2167,3 +2167,29 @@ html.fcc-popup-open {
 @media (max-width: 540px) {
   .fcc-home-products { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* Brand filters and specification tables use the same product data as the admin. */
+.fcc-brand-filter { padding: 24px 0; border-top: 1px solid var(--line); }
+#fcc-brand-options { max-height: 280px; overflow-y: auto; margin-top: 16px; }
+#fcc-brand-options label { display: flex; align-items: center; gap: 10px; padding: 8px 0; font-size: 14px; }
+#fcc-brand-options input { accent-color: var(--green); }
+.fcc-specifications { width: 100%; border-collapse: collapse; margin: 24px 0; font-size: 14px; }
+.fcc-specifications caption { text-align: left; font-weight: bold; margin-bottom: 8px; }
+.fcc-specifications th, .fcc-specifications td { padding: 12px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+.fcc-specifications th { width: 45%; }
+#fcc-home .fcc-home-product,
+#fcc-home .fcc-home-about,
+#fcc-home .fcc-flooring-card,
+#fcc-home .fcc-hero-image { border-radius: 18px; overflow: hidden; }
+#fcc-home .fcc-button { border-radius: 10px; }
+
+/* A quieter catalogue layout lets the product photography lead. */
+.fcc-catalog-intro { background: transparent; padding-top: 32px; padding-bottom: 0; }
+.fcc-breadcrumb { font-size: 13px; margin-bottom: 24px; color: var(--muted); }
+.fcc-catalog-intro h1 { font-size: clamp(34px, 4vw, 48px); }
+.fcc-filters .fcc-filter-box { background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; }
+.fcc-catalog .fcc-catalog-card { background: transparent; border: 0; }
+.fcc-catalog .fcc-card-body { text-align: left; }
+@media (min-width: 1400px) {
+  .fcc-catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}

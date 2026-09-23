@@ -328,3 +328,46 @@ dialog::backdrop {
     transition:none
   }
 }
+
+/* Dashboard destinations and full-page product editing. */
+.dashboard-sections {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: stretch;
+}
+.dashboard-sections section {
+  background: white;
+  border: 1px solid #dbe2ea;
+  border-radius: 14px;
+  padding: 24px;
+}
+.dashboard-sections h2 { margin: 0 0 12px; }
+.dashboard-sections a, .category-choices a { color: #23486a; font-weight: 600; }
+.category-choices, .specification-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.category-choices a {
+  display: block;
+  padding: 24px;
+  border: 1px solid #cbd5e1;
+  border-radius: 12px;
+  background: white;
+  text-decoration: none;
+}
+.category-choices a:hover { background: #eaf0f7; }
+.product-editor {
+  max-width: 920px;
+  margin: 0 auto 60px;
+  padding: 32px;
+  background: white;
+  border: 1px solid #dbe2ea;
+  border-radius: 16px;
+}
+body[data-view] .dashboard-sections { display: none; }
+[hidden] { display: none !important; }
+@media (max-width: 700px) {
+  .dashboard-sections, .category-choices, .specification-fields { grid-template-columns: 1fr; }
+  .product-editor { margin: 0 5% 40px; padding: 20px; }
+}

@@ -1,3 +1,4 @@
+import { labels } from './product-fields.js';
 (() => {
   const $ = id => document.getElementById(id), grid = document.querySelector('.fcc-catalog-grid');
   if (!grid) return;
@@ -57,6 +58,20 @@
     if (item.price_cents != null) content.append(element('p', new Intl.NumberFormat('en-CA', {
       style: 'currency', currency: 'CAD'
     }).format(item.price_cents / 100) + ' CAD ' + item.price_unit, 'fcc-cms-price'));
+    const specifications = { ...(item.brand ? { brand: item.brand } : {}), ...item.specifications };
+    if (Object.keys(specifications).length) {
+      const table = element('table', undefined, 'fcc-specifications');
+      const caption = element('caption', 'Product specifications');
+      table.append(caption);
+      for (const [key, value] of Object.entries(specifications)) {
+        const row = element('tr');
+        const heading = element('th', key === 'brand' ? 'Brand / company' : labels[key] || key);
+        heading.scope = 'row';
+        row.append(heading, element('td', value));
+        table.append(row);
+      }
+      content.append(table);
+    }
     content.append(element('p', item.description || 'Contact our team for product details.', 'fcc-cms-description'));
     const link = element('a', 'Enquire about this product', 'fcc-button');
     link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name);
@@ -111,13 +126,15 @@
       const requestedCategory = new URLSearchParams(location.search).get('category') || '';
       const category = [...document.querySelectorAll('button[data-category]')].some(b => b.dataset.category === requestedCategory) ? requestedCategory : 'all';
       document.querySelectorAll('button[data-category]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.category === category)));
-      const data = await json('/api/products?' + new URLSearchParams({
+      const filters = new URLSearchParams({
         page, limit: size.value, q: search.value, sort: sort.value, ...(category !== 'all' ? {
           category
         }
         : {
         })
-      }), signal);
+      });
+      document.querySelectorAll('#fcc-brand-options input:checked').forEach(input => filters.append('brand', input.value));
+      const data = await json('/api/products?' + filters, signal);
       if (signal.aborted) return;
       const nextCards = document.createDocumentFragment();
       for (const item of data.items) {
@@ -185,7 +202,8 @@
   });
   $('fcc-reset-filters').onclick = () => {
     search.value = '';
-    sort.value = 'featured';
+    sort.value = 'brand';
+    document.querySelectorAll('#fcc-brand-options input').forEach(input => input.checked = false);
     page = 1;
     history.replaceState(null, '', location.pathname);
     load();
@@ -206,5 +224,29 @@
     url.hash = '';
     history.replaceState(null, '', url);
   }
+  async function loadBrands() {
+    const box = $('fcc-brand-options');
+    try {
+      const data = await json('/api/brands');
+      box.replaceChildren();
+      for (const brand of data.items) {
+        const label = element('label');
+        const input = element('input');
+        input.type = 'checkbox';
+        input.value = brand.name;
+        input.addEventListener('change', () => { page = 1; load(); });
+        label.append(input, document.createTextNode(brand.name));
+        box.append(label);
+      }
+      if (!data.items.length) box.textContent = 'Brands will appear as products are updated.';
+    } catch {
+      box.replaceChildren();
+      const retry = element('button', 'Retry loading brands');
+      retry.type = 'button';
+      retry.onclick = loadBrands;
+      box.append(retry);
+    }
+  }
+  loadBrands();
   load();
 })();

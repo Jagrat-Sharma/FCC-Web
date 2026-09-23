@@ -1,3 +1,4 @@
+import { labels } from '../product-fields.js';
 import {
   HttpError
 }
@@ -29,7 +30,17 @@ export function record(input, kind) {
   if (kind === 'products') {
     const price = input.price_cents === null ? null : integer(input.price_cents, 0, 100000000, 'Price in cents');
     if (!['', 'per sq. ft.', 'per item', 'per box'].includes(input.price_unit)) throw new HttpError(400, 'Invalid price unit.');
+    const specifications = input.specifications ?? {};
+    if (!specifications || Array.isArray(specifications) || typeof specifications !== 'object') throw new HttpError(400, 'Specifications must be an object.');
+    const clean = {};
+    for (const [key, value] of Object.entries(specifications)) {
+      if (!Object.hasOwn(labels, key)) throw new HttpError(400, 'Unknown specification field.');
+      const result = text(value, labels[key], 180);
+      if (result) clean[key] = result;
+    }
     return {
+      brand: text(input.brand ?? '', 'Brand / company', 120),
+      specifications: JSON.stringify(clean),
       ...common, name: text(input.name, 'Name', 120, true), category_id: text(input.category_id, 'Category', 80, true), price_cents: price, price_unit: input.price_unit, featured: flag(input.featured, 'Featured')
     };
   }

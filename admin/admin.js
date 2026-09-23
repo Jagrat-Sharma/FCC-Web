@@ -1,6 +1,11 @@
+import { labels, categoryFields } from '/product-fields.js';
 const $ = id => document.getElementById(id);
 const form = $('edit-form'), field = name => form.elements.namedItem(name);
-let kind = 'products', page = 1, current = null, imageId = null, busy = false, sequence = 0;
+const view = document.body.dataset.view;
+const parameters = new URLSearchParams(location.search);
+let categories = [];
+let kind = ['products', 'gallery', 'media'].includes(parameters.get('section')) ? parameters.get('section') : 'products';
+let page = 1, current = null, imageId = null, busy = false, sequence = 0;
 function node(tag, text, cls) {
   const e = document.createElement(tag);
   if (text !== undefined) e.textContent = text;
@@ -67,7 +72,12 @@ function edit(item = null) {
   }
   field('sort_order').value = item?.sort_order || 0;
   preview();
-  $('editor').showModal();
+  if (kind === 'products') {
+    field('brand').value = item?.brand || '';
+    if (!item && parameters.get('category')) field('category_id').value = parameters.get('category');
+    renderSpecifications(item?.specifications || {});
+  }
+  if (view !== 'product') $('editor').showModal();
   field('name').focus();
 }
 async function list() {
@@ -98,7 +108,7 @@ async function list() {
       const actions = node('div', undefined, 'actions');
       if (kind !== 'media') {
         const button = node('button', 'Edit');
-        button.onclick = () => edit(item);
+        button.onclick = () => kind === 'products' ? location.assign('/admin/product.html?id=' + item.id) : edit(item);
         actions.append(button);
       }
       const del = node('button', 'Delete', 'secondary');
@@ -128,7 +138,8 @@ async function list() {
     if (seq === sequence) $('list-status').textContent = e.message + ' Use Refresh to try again.';
   }
 }
-$('cancel').onclick = () => $('editor').close();
+if (view === 'product') lock(true);
+$('cancel').onclick = () => view === 'product' ? location.assign('/admin/') : $('editor').close();
 $('editor').addEventListener('cancel', e => {
   if (busy) e.preventDefault();
 });
@@ -185,6 +196,7 @@ form.onsubmit = async e => {
     })
   };
   if (kind === 'products') Object.assign(data, {
+    brand: field('brand').value, specifications: Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value])),
     name: field('name').value, category_id: field('category_id').value, price_cents: current?.price_cents ?? null, price_unit: current?.price_unit ?? '', featured: field('featured').checked
   });
   else Object.assign(data, {
@@ -194,6 +206,7 @@ form.onsubmit = async e => {
   $('form-status').textContent = 'Saving…';
   try {
     await write(kind + (current ? '/' + current.id : ''), current ? 'PUT' : 'POST', data);
+    if (view === 'product') { location.assign('/admin/?saved=1'); return; }
     $('editor').close();
     $('notice').textContent = data.published ? 'Saved and published on the website.' : 'Draft saved. It is not visible on the website.';
     await list();
@@ -203,18 +216,7 @@ form.onsubmit = async e => {
     lock(false);
   }
 };
-document.querySelectorAll('[data-kind]').forEach(button => button.onclick = () => {
-  kind = button.dataset.kind;
-  page = 1;
-  $('search').value = '';
-  $('search').disabled = kind === 'media';
-  $('new').hidden = kind === 'media';
-  $('new').textContent = kind === 'products' ? 'Add product' : 'Add gallery item';
-  $('section-title').textContent = button.textContent;
-  document.querySelectorAll('[data-kind]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-  list();
-});
-$('new').onclick = () => edit();
+$('new').onclick = () => kind === 'products' ? location.assign('/admin/categories.html') : edit();
 $('refresh').onclick = () => list();
 $('previous').onclick = () => {
   page--;
@@ -235,17 +237,57 @@ $('search').oninput = () => {
 (async () => {
   try {
     const session = await api('session');
-    const categories = await api('categories');
+    categories = (await api('categories')).items;
     $('identity').textContent = session.email;
-    for (const c of categories.items) {
+    for (const c of categories) {
       const option = node('option', c.name);
       option.value = c.id;
       field('category_id').append(option);
     }
     document.querySelectorAll('nav button,#new,#refresh,#search').forEach(e => e.disabled = false);
-    await list();
+    if (view === 'categories') {
+      $('content-list').hidden = true;
+      $('category-picker').hidden = false;
+      for (const category of categories) {
+        const link = node('a', category.name);
+        link.href = '/admin/product.html?category=' + encodeURIComponent(category.id);
+        $('category-choices').append(link);
+      }
+    } else if (view === 'product') {
+      kind = 'products';
+      $('content-list').hidden = true;
+      const item = parameters.get('id') ? (await api('products/' + parameters.get('id'))).item : null;
+      edit(item);
+      lock(false);
+    } else {
+      $('new').hidden = kind === 'media';
+      $('new').textContent = kind === 'gallery' ? 'Add gallery item' : 'Add product';
+      $('section-title').textContent = kind === 'media' ? 'Images' : kind === 'gallery' ? 'Gallery' : 'Products';
+      $('search').disabled = kind === 'media';
+      if (parameters.has('saved')) $('notice').textContent = 'Product saved successfully.';
+      await list();
+    }
   } catch (e) {
     $('notice').textContent = e.message;
     $('signin').hidden = false;
   }
 })();
+
+function renderSpecifications(values = {}) {
+  const category = categories.find(item => item.id === field('category_id').value);
+  $('editor-title').textContent = (current ? 'Edit ' : 'Add ') + (category?.name || 'product');
+  $('specification-fields').replaceChildren();
+  for (const key of categoryFields[category?.slug] || []) {
+    const label = node('label', labels[key]);
+    const input = node('input');
+    input.dataset.spec = key;
+    input.maxLength = 180;
+    input.value = values[key] || '';
+    label.append(input);
+    $('specification-fields').append(label);
+  }
+}
+field('category_id').addEventListener('change', () => {
+  const values = Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value]));
+  renderSpecifications(values);
+});

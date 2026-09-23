@@ -26,7 +26,7 @@ function pageOptions(url) {
 }
 function itemView(row) {
   return {
-    ...row, published: !!row.published, ...(row.featured !== undefined ? {
+    ...row, ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
       featured: !!row.featured
     }
     : {
@@ -48,6 +48,12 @@ async function listItems(env, url, kind, admin) {
     conditions.push(`(t.${kind === 'products' ? 'name' : 'title'} LIKE ? ESCAPE '\\' OR t.description LIKE ? ESCAPE '\\')`);
     args.push(pattern, pattern);
   }
+  const brands = url.searchParams.getAll('brand');
+  if (brands.length > 30 || brands.some(value => value.length > 120)) throw new HttpError(400, 'Invalid brand filter.');
+  if (brands.length && kind === 'products') {
+    conditions.push(`t.brand COLLATE NOCASE IN (${brands.map(() => '?').join(',')})`);
+    args.push(...brands);
+  }
   const category = url.searchParams.get('category');
   if (category && kind === 'products') {
     conditions.push('c.slug = ?');
@@ -59,7 +65,7 @@ async function listItems(env, url, kind, admin) {
   const select = kind === 'products' ? 't.*, c.name AS category_name, c.slug AS category_slug' : 't.*';
   const sort = url.searchParams.get('sort') || 'featured';
   const order = kind === 'gallery' ? 't.sort_order ASC, t.created_at DESC, t.id ASC' :
-  (new Map([['az', 't.name COLLATE NOCASE ASC, t.id ASC'], ['za', 't.name COLLATE NOCASE DESC, t.id ASC'], ['featured', 't.featured DESC, t.created_at DESC, t.id ASC']]).get(sort));
+  (new Map([['brand', 't.brand COLLATE NOCASE ASC, t.name COLLATE NOCASE ASC, t.id ASC'], ['az', 't.name COLLATE NOCASE ASC, t.id ASC'], ['za', 't.name COLLATE NOCASE DESC, t.id ASC'], ['featured', 't.featured DESC, t.created_at DESC, t.id ASC']]).get(sort));
   if (!order) throw new HttpError(400, 'Invalid sort order.');
   const count = await env.DB.prepare(`SELECT COUNT(*) AS total FROM ${kind} t${join}${where}`).bind(...args).first();
   const rows = await env.DB.prepare(`SELECT ${select} FROM ${kind} t${join}${where} ORDER BY ${order} LIMIT ? OFFSET ?`).bind(...args, limit, offset).all();
@@ -150,6 +156,10 @@ export async function handleAPI({
     const [kind, id, action] = parts;
     if (parts.length > 3) throw new HttpError(404, 'Route not found.');
     if (admin && kind === 'session' && !id && request.method === 'GET') return json(user);
+    if (kind === 'brands' && !id && request.method === 'GET') {
+      const rows = await env.DB.prepare("SELECT brand AS name FROM products WHERE published = 1 AND brand <> '' GROUP BY brand COLLATE NOCASE ORDER BY brand COLLATE NOCASE").all();
+      return json({ items: rows.results });
+    }
     if (kind === 'categories' && !id && request.method === 'GET') {
       const rows = await env.DB.prepare('SELECT id, name, slug FROM categories ORDER BY sort_order, name').all();
       return json({

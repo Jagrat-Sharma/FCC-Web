@@ -6,7 +6,7 @@
     <meta name="description" content="Products — First Choice Carpets, serving Toronto, Ontario.">
     <title>Products | First Choice Carpets</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=fc-mark">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=fc-mark-2">
   </head>
   <body>
     <!-- WORDPRESS CONTENT START -->
@@ -140,10 +140,9 @@
       </header>
       <main id="fcc-main">
         <section class="fcc-section fcc-catalog-intro">
-          <p class="fcc-eyebrow">OUR PRODUCTS</p>
-          <h1>Find your perfect foundation.</h1>
-          <p>Explore textures and tones for your Brampton home.</p>
-          <p class="fcc-small">Explore our current collection. Contact us to confirm availability and request a quote.</p>
+          <nav class="fcc-breadcrumb" aria-label="Breadcrumb"><a href="index.html">Home</a><span aria-hidden="true"> / </span><span>All products</span></nav>
+          <h1>Products</h1>
+          <p>Browse by product type or company to find your next floor.</p>
         </section>
         <section class="fcc-section fcc-catalog" aria-label="Flooring catalogue">
           <aside class="fcc-filters" aria-label="Product filters">
@@ -165,6 +164,10 @@
                 <button type="button" id="filter-accessories" data-category="accessories" aria-pressed="false" disabled>Accessories</button>
               </div>
             </div>
+            <section class="fcc-brand-filter" aria-labelledby="fcc-brand-title">
+              <h3 id="fcc-brand-title">Brand / company</h3>
+              <div id="fcc-brand-options">Loading brands…</div>
+            </section>
             <button type="button" class="fcc-reset" id="fcc-reset-filters" disabled>Reset filters</button><noscript>
               <p>Enable JavaScript to view the catalogue, or contact us for product information.</p></noscript>
           </aside>
@@ -174,6 +177,7 @@
               <div>
                 <label for="fcc-product-sort">Sort</label>
                 <select id="fcc-product-sort" disabled>
+                  <option value="brand">Company A–Z</option>
                   <option value="featured">Featured</option>
                   <option value="az">Name: A–Z</option>
                   <option value="za">Name: Z–A</option>
@@ -227,7 +231,7 @@
     <!-- WORDPRESS CONTENT END -->
     <script src="navigation.js" defer>
     </script>
-    <script src="catalogue.js" defer>
+    <script type="module" src="catalogue.js">
     </script>
   </body>
 </html>
