@@ -25,6 +25,7 @@
         <section><h2>Products</h2><p>Add products, edit specifications and control visibility.</p><a href="/admin/?section=products">Manage products</a></section>
         <section><h2>Gallery</h2><p>Share your installations and recent work.</p><a href="/admin/?section=gallery">Manage gallery</a></section>
         <section><h2>Images</h2><p>Review uploaded images and remove unused files.</p><a href="/admin/?section=media">Manage images</a></section>
+        <section><h2>Blog</h2><p>Write articles, save drafts and publish advice.</p><a href="/admin/?section=blogs">Manage blog</a></section>
       </nav>
       <section id="category-picker" hidden>
         <a href="/admin/">Back to products</a>
@@ -72,6 +73,9 @@
             <input name="sort_order" type="number" min="0" max="9999" step="1" value="0"></label>
           <label>Description
             <textarea name="description" rows="5" maxlength="5000"></textarea>
+          </label>
+          <label id="blog-content-field" hidden>Article text
+            <textarea name="content" rows="14" maxlength="30000" placeholder="Write your article. Separate paragraphs with a blank line."></textarea>
           </label>
           <label>Upload / replace image
             <input id="upload" type="file" accept="image/jpeg,image/png,image/webp"></label>

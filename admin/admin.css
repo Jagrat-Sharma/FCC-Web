@@ -371,3 +371,5 @@ body[data-view] .dashboard-sections { display: none; }
   .dashboard-sections, .category-choices, .specification-fields { grid-template-columns: 1fr; }
   .product-editor { margin: 0 5% 40px; padding: 20px; }
 }
+
+@media (min-width: 1000px) { .dashboard-sections { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

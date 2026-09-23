@@ -4,7 +4,7 @@ const form = $('edit-form'), field = name => form.elements.namedItem(name);
 const view = document.body.dataset.view;
 const parameters = new URLSearchParams(location.search);
 let categories = [];
-let kind = ['products', 'gallery', 'media'].includes(parameters.get('section')) ? parameters.get('section') : 'products';
+let kind = ['products', 'gallery', 'media', 'blogs'].includes(parameters.get('section')) ? parameters.get('section') : 'products';
 let page = 1, current = null, imageId = null, busy = false, sequence = 0;
 function node(tag, text, cls) {
   const e = document.createElement(tag);
@@ -58,9 +58,12 @@ function edit(item = null) {
   imageId = item?.image_id || null;
   form.reset();
   $('form-status').textContent = '';
-  $('editor-title').textContent = (item ? 'Edit ' : 'Add ') + (kind === 'products' ? 'product' : 'gallery item');
+  $('editor-title').textContent = (item ? 'Edit ' : 'Add ') + (kind === 'products' ? 'product' : kind === 'blogs' ? 'blog post' : 'gallery item');
   $('product-fields').hidden = kind !== 'products';
   field('category_id').disabled = kind !== 'products';
+  $('blog-content-field').hidden = kind !== 'blogs';
+  field('content').required = kind === 'blogs';
+  field('content').value = item?.content || '';
   $('order-field').hidden = kind !== 'gallery';
   field('name').value = item?.name || item?.title || '';
   field('description').value = item?.description || '';
@@ -199,6 +202,7 @@ form.onsubmit = async e => {
     brand: field('brand').value, specifications: Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value])),
     name: field('name').value, category_id: field('category_id').value, price_cents: current?.price_cents ?? null, price_unit: current?.price_unit ?? '', featured: field('featured').checked
   });
+  else if (kind === 'blogs') Object.assign(data, { title: field('name').value, content: field('content').value });
   else Object.assign(data, {
     title: field('name').value, sort_order: Number(field('sort_order').value)
   });
@@ -261,8 +265,8 @@ $('search').oninput = () => {
       lock(false);
     } else {
       $('new').hidden = kind === 'media';
-      $('new').textContent = kind === 'gallery' ? 'Add gallery item' : 'Add product';
-      $('section-title').textContent = kind === 'media' ? 'Images' : kind === 'gallery' ? 'Gallery' : 'Products';
+      $('new').textContent = kind === 'gallery' ? 'Add gallery item' : kind === 'blogs' ? 'Add blog post' : 'Add product';
+      $('section-title').textContent = kind === 'media' ? 'Images' : kind === 'gallery' ? 'Gallery' : kind === 'blogs' ? 'Blog' : 'Products';
       $('search').disabled = kind === 'media';
       if (parameters.has('saved')) $('notice').textContent = 'Product saved successfully.';
       await list();

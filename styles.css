@@ -2193,3 +2193,30 @@ html.fcc-popup-open {
 @media (min-width: 1400px) {
   .fcc-catalog-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
+
+/* Shared footer navigation and database-backed articles. */
+.fcc-footer-links {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+  width: 100%;
+  padding: 32px 0;
+  border-block: 1px solid #ffffff30;
+}
+.fcc-footer-links h3 { font: 600 16px/1.4 Arial, sans-serif; margin-bottom: 16px; }
+.fcc-footer-links a { display: block; font-size: 14px; margin-top: 10px; }
+.fcc-footer-links a:hover, .fcc address a:hover { text-decoration: underline; }
+.fcc-blog-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 32px; }
+.fcc-blog-grid article { border: 1px solid var(--line); border-radius: 16px; overflow: hidden; }
+.fcc-blog-grid article > div { padding: 24px; }
+.fcc-blog-grid img { height: auto; aspect-ratio: 3 / 2; object-fit: cover; }
+.fcc-blog-grid h2 { font-size: 28px; margin: 12px 0; }
+.fcc-blog-grid p { margin: 16px 0; white-space: pre-line; }
+.fcc-blog-grid time { font-size: 13px; color: var(--muted); }
+.fcc-blog-grid article > div > a { text-decoration: underline; }
+.fcc-blog-article { display: block; max-width: 850px; margin-inline: auto; }
+.fcc-blog-pagination { display: flex; gap: 16px; margin-top: 28px; }
+@media (max-width: 900px) { .fcc-blog-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .fcc-blog-grid, .fcc-footer-links { grid-template-columns: 1fr; }
+}

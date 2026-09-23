@@ -44,6 +44,7 @@ export function record(input, kind) {
       ...common, name: text(input.name, 'Name', 120, true), category_id: text(input.category_id, 'Category', 80, true), price_cents: price, price_unit: input.price_unit, featured: flag(input.featured, 'Featured')
     };
   }
+  if (kind === 'blogs') return { ...common, title: text(input.title, 'Title', 120, true), content: text(input.content, 'Article', 30000, true) };
   if (!image) throw new HttpError(400, 'Upload an image for this gallery item.');
   return {
     ...common, title: text(input.title, 'Title', 120, true), sort_order: integer(input.sort_order, 0, 9999, 'Display order')

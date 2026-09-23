@@ -40,6 +40,7 @@ function setup() {
   const sql = new DatabaseSync(':memory:');
   sql.exec(readFileSync(new URL('../migrations/0001_initial.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../migrations/0002_product_specifications.sql', import.meta.url), 'utf8'));
+  sql.exec(readFileSync(new URL('../migrations/0003_blog.sql', import.meta.url), 'utf8'));
   const DB = {
     prepare(query) {
       const statement = sql.prepare(query);
@@ -319,5 +320,37 @@ test('brand filters and specifications persist safely without exposing draft bra
   for (const path of ['/admin/product.html', '/admin/categories.html']) {
     assert.equal((await handleAdmin({ env, request: req(path, 'GET', undefined, null) })).status, 401);
   }
+  env.sql.close();
+});
+
+test('blog CRUD enforces drafts, validation, conflicts and referenced cover protection', async () => {
+  const env = setup();
+  const call = (path, method, body) => handleAPI({ env, request: req(path, method, body) });
+  const image = (await (await handleAPI({ env, request: new Request(base.PUBLIC_ORIGIN + '/api/admin/media', {
+    method: 'POST', headers: { 'Cf-Access-Jwt-Assertion': valid, Origin: base.PUBLIC_ORIGIN, 'X-FCC-Admin': '1', 'Content-Type': 'image/png' },
+    body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aHoQAAAAASUVORK5CYII=','base64')
+  }) })).json()).item;
+  const post = { title: 'Choosing carpet', description: 'A short introduction.', content: 'First paragraph.\n\nSecond paragraph.', image_id: image.id, image_alt: 'Carpet texture', published: false };
+  assert.equal((await handleAPI({ env, request: req('/api/admin/blogs', 'POST', post, null) })).status, 401);
+  assert.equal((await call('/api/blogs', 'POST', post)).status, 405);
+  for (const content of ['', '<script>alert(1)</script>', 'x'.repeat(30001)]) {
+    assert.equal((await call('/api/admin/blogs', 'POST', { ...post, content })).status, 400);
+  }
+  const created = await call('/api/admin/blogs', 'POST', post);
+  assert.equal(created.status, 201);
+  const { item } = await created.json();
+  assert.equal((await (await call('/api/blogs')).json()).total, 0);
+  assert.equal((await call('/api/blogs/' + item.id)).status, 404);
+  await assert.rejects(() => mediaResponse(req('/media/' + image.id), env, image.id), error => error.status === 404);
+  assert.equal((await call('/api/admin/media/' + image.id, 'DELETE', {})).status, 409);
+  assert.equal((await (await call('/api/admin/media')).json()).items[0].references_count, 1);
+  assert.equal((await call('/api/admin/blogs/' + item.id, 'PUT', { ...post, content: 'x'.repeat(30000), published: true, version: 1 })).status, 200);
+  assert.equal((await mediaResponse(req('/media/' + image.id), env, image.id)).status, 200);
+  assert.equal((await (await call('/api/blogs')).json()).total, 1);
+  assert.equal((await (await call('/api/blogs/' + item.id)).json()).item.content.length, 30000);
+  assert.equal((await call('/api/admin/blogs/' + item.id, 'DELETE', { version: 1 })).status, 409);
+  assert.equal((await call('/api/admin/blogs/' + item.id, 'DELETE', { version: 2 })).status, 200);
+  assert.equal((await call('/api/blogs/' + item.id)).status, 404);
+  assert.equal((await call('/api/admin/media/' + image.id, 'DELETE', {})).status, 200);
   env.sql.close();
 });

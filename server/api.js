@@ -10,7 +10,7 @@ import {
   UUID, record, integer, text, imageType
 }
 from './validation.js';
-const kinds = new Set(['products', 'gallery']);
+const kinds = new Set(['products', 'gallery', 'blogs']);
 const nowSQL = "strftime('%Y-%m-%dT%H:%M:%fZ','now')";
 function idCheck(id) {
   if (!UUID.test(id || '')) throw new HttpError(404, 'Item not found.');
@@ -64,7 +64,7 @@ async function listItems(env, url, kind, admin) {
   const join = kind === 'products' ? ' JOIN categories c ON c.id = t.category_id' : '';
   const select = kind === 'products' ? 't.*, c.name AS category_name, c.slug AS category_slug' : 't.*';
   const sort = url.searchParams.get('sort') || 'featured';
-  const order = kind === 'gallery' ? 't.sort_order ASC, t.created_at DESC, t.id ASC' :
+  const order = kind === 'blogs' ? 't.created_at DESC, t.id ASC' : kind === 'gallery' ? 't.sort_order ASC, t.created_at DESC, t.id ASC' :
   (new Map([['brand', 't.brand COLLATE NOCASE ASC, t.name COLLATE NOCASE ASC, t.id ASC'], ['az', 't.name COLLATE NOCASE ASC, t.id ASC'], ['za', 't.name COLLATE NOCASE DESC, t.id ASC'], ['featured', 't.featured DESC, t.created_at DESC, t.id ASC']]).get(sort));
   if (!order) throw new HttpError(400, 'Invalid sort order.');
   const count = await env.DB.prepare(`SELECT COUNT(*) AS total FROM ${kind} t${join}${where}`).bind(...args).first();
@@ -126,7 +126,7 @@ export async function mediaResponse(request, env, id, admin = false) {
   const row = await env.DB.prepare('SELECT * FROM media WHERE id = ?').bind(id).first();
   if (!row) throw new HttpError(404, 'Image not found.');
   if (!admin) {
-    const visible = await env.DB.prepare('SELECT id FROM products WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM gallery WHERE image_id = ? AND published = 1 LIMIT 1').bind(id, id).first();
+    const visible = await env.DB.prepare('SELECT id FROM products WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM gallery WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM blogs WHERE image_id = ? AND published = 1 LIMIT 1').bind(id, id, id).first();
     if (!visible) throw new HttpError(404, 'Image not found.');
   }
   const object = await env.IMAGES.get(row.object_key);
@@ -175,7 +175,7 @@ export async function handleAPI({
           page, limit, offset
         }
         = pageOptions(url);
-        const rows = await env.DB.prepare('SELECT m.*, (SELECT COUNT(*) FROM products WHERE image_id=m.id) + (SELECT COUNT(*) FROM gallery WHERE image_id=m.id) AS references_count FROM media m ORDER BY created_at DESC, id LIMIT ? OFFSET ?').bind(limit, offset).all();
+        const rows = await env.DB.prepare('SELECT m.*, (SELECT COUNT(*) FROM products WHERE image_id=m.id) + (SELECT COUNT(*) FROM gallery WHERE image_id=m.id) + (SELECT COUNT(*) FROM blogs WHERE image_id=m.id) AS references_count FROM media m ORDER BY created_at DESC, id LIMIT ? OFFSET ?').bind(limit, offset).all();
         const count = await env.DB.prepare('SELECT COUNT(*) AS total FROM media').first();
         return json({
           items: rows.results.map(row => ({
@@ -190,7 +190,7 @@ export async function handleAPI({
         try {
           await env.DB.prepare('DELETE FROM media WHERE id = ?').bind(id).run();
         } catch (error) {
-          if (String(error.message).includes('FOREIGN KEY')) throw new HttpError(409, 'This image is still used by a product or gallery item.');
+          if (String(error.message).includes('FOREIGN KEY')) throw new HttpError(409, 'This image is still used by a product, gallery item or blog post.');
           throw error;
         }
         await env.IMAGES.delete(row.object_key);

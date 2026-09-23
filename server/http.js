@@ -43,7 +43,7 @@ export async function boundedBody(request, limit) {
 export async function readJSON(request) {
   if (request.headers.get('content-type')?.split(';')[0] !== 'application/json') throw new HttpError(415, 'Send application/json.');
   try {
-    const value = JSON.parse(new TextDecoder().decode(await boundedBody(request, 24000)));
+    const value = JSON.parse(new TextDecoder().decode(await boundedBody(request, 160000)));
     if (!value || Array.isArray(value) || typeof value !== 'object') throw new Error();
     return value;
   } catch (error) {
