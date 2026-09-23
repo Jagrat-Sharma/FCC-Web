@@ -10,10 +10,12 @@
     if (!form.reportValidity()) return;
     const data = new FormData(form);
     const brief = ['FLOORING ENQUIRY — FIRST CHOICE CARPETS', 'Service area: Brampton, Ontario', '',
-      `Name: ${data.get('name')}`, `Email: ${data.get('email')}`, `Interested in: ${data.get('material')}`,
-      '', 'Project details:', data.get('details') || 'To be discussed', '',
-      'This is a personal draft. It has NOT been sent to First Choice Carpets.'].join('\n');
-    const url = URL.createObjectURL(new Blob([brief], { type: 'text/plain;charset=utf-8' }));
+    `Name: ${data.get('name')}`, `Email: ${data.get('email')}`, `Interested in: ${data.get('material')}`,
+    '', 'Project details:', data.get('details') || 'To be discussed', '',
+    'This is a personal draft. It has NOT been sent to First Choice Carpets.'].join('\n');
+    const url = URL.createObjectURL(new Blob([brief], {
+      type: 'text/plain;charset=utf-8'
+    }));
     const link = document.createElement('a');
     link.href = url;
     link.download = 'first-choice-carpets-enquiry.txt';

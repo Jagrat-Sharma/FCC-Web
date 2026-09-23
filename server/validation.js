@@ -1,4 +1,7 @@
-import { HttpError } from './http.js';
+import {
+  HttpError
+}
+from './http.js';
 export const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 export function text(value, name, max, required = false) {
   if (typeof value !== 'string') throw new HttpError(400, `${name} must be text.`);
@@ -26,10 +29,14 @@ export function record(input, kind) {
   if (kind === 'products') {
     const price = input.price_cents === null ? null : integer(input.price_cents, 0, 100000000, 'Price in cents');
     if (!['', 'per sq. ft.', 'per item', 'per box'].includes(input.price_unit)) throw new HttpError(400, 'Invalid price unit.');
-    return { ...common, name: text(input.name, 'Name', 120, true), category_id: text(input.category_id, 'Category', 80, true), price_cents: price, price_unit: input.price_unit, featured: flag(input.featured, 'Featured') };
+    return {
+      ...common, name: text(input.name, 'Name', 120, true), category_id: text(input.category_id, 'Category', 80, true), price_cents: price, price_unit: input.price_unit, featured: flag(input.featured, 'Featured')
+    };
   }
   if (!image) throw new HttpError(400, 'Upload an image for this gallery item.');
-  return { ...common, title: text(input.title, 'Title', 120, true), sort_order: integer(input.sort_order, 0, 9999, 'Display order') };
+  return {
+    ...common, title: text(input.title, 'Title', 120, true), sort_order: integer(input.sort_order, 0, 9999, 'Display order')
+  };
 }
 export function imageType(bytes, claimed) {
   const starts = sequence => sequence.every((n, i) => bytes[i] === n);

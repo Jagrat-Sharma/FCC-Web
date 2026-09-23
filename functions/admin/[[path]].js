@@ -1,1 +1,4 @@
-export { handleAdmin as onRequest } from '../../server/admin.js';
+export {
+  handleAdmin as onRequest
+}
+from '../../server/admin.js';

@@ -8,7 +8,6 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
   let expanded = menu.open;
   let openedByHover = false;
   trigger.setAttribute('aria-expanded', String(expanded));
-
   function setExpanded(next) {
     clearTimeout(closeTimer);
     if (next === expanded) return;
@@ -16,20 +15,40 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
     const wasVisible = menu.open;
     const current = getComputedStyle(panel);
     const from = wasVisible
-      ? { opacity: current.opacity, transform: current.transform }
-      : { opacity: '0', transform: 'translateY(-10px)' };
-    if (animation) { animation.cancel(); animation = null; }
-    menu.open = true; // Keep the disclosure rendered until its exit finishes.
-    if (!next && panel.contains(document.activeElement)) trigger.focus({ preventScroll: true });
+    ? {
+      opacity: current.opacity, transform: current.transform
+    }
+    : {
+      opacity: '0', transform: 'translateY(-10px)'
+    };
+    if (animation) {
+      animation.cancel();
+      animation = null;
+    }
+    menu.open = true;
+    // Keep the disclosure rendered until its exit finishes.
+    if (!next && panel.contains(document.activeElement)) trigger.focus({
+      preventScroll: true
+    });
     panel.inert = !next;
     trigger.setAttribute('aria-expanded', String(next));
     menu.classList.toggle('fcc-menu-expanded', next);
-    const finish = () => { menu.open = next; animation = null; };
-    if (reducedMotion.matches || !panel.animate) { finish(); return; }
+    const finish = () => {
+      menu.open = next;
+      animation = null;
+    };
+    if (reducedMotion.matches || !panel.animate) {
+      finish();
+      return;
+    }
     animation = panel.animate([
-      from,
-      next ? { opacity: '1', transform: 'translateY(0)' }
-           : { opacity: '0', transform: 'translateY(-7px)' }
+    from,
+    next ? {
+      opacity: '1', transform: 'translateY(0)'
+    }
+    : {
+      opacity: '0', transform: 'translateY(-7px)'
+    }
     ], {
       duration: next ? 280 : 200,
       easing: next ? 'cubic-bezier(0.22, 1, 0.36, 1)' : 'cubic-bezier(0.4, 0, 1, 1)'
@@ -43,13 +62,24 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
     if (category.open) return;
     // Keep focus out of a panel that is about to be hidden by hover.
     const focusedPanel = categories.find(item => item !== category && item.contains(document.activeElement));
-    categories.forEach(item => { item.open = item === category; });
-    if (focusedPanel) category.querySelector('summary').focus({ preventScroll: true });
+    categories.forEach(item => {
+      item.open = item === category;
+    });
+    if (focusedPanel) category.querySelector('summary').focus({
+      preventScroll: true
+    });
     const content = category.querySelector('.fcc-submenu');
     if (!reducedMotion.matches && content.animate) {
-      content.animate([{ opacity: 0, transform: 'translateX(-5px)' },
-        { opacity: 1, transform: 'translateX(0)' }],
-      { duration: 180, easing: 'ease-out' });
+      content.animate([{
+        opacity: 0, transform: 'translateX(-5px)'
+      },
+      {
+        opacity: 1, transform: 'translateX(0)'
+      }
+      ],
+      {
+        duration: 180, easing: 'ease-out'
+      });
     }
   }
   categories.forEach(category => {
@@ -89,7 +119,10 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
   menu.addEventListener('pointerenter', event => {
     if (event.pointerType !== 'mouse') return;
     clearTimeout(closeTimer);
-    if (!expanded) { setExpanded(true); openedByHover = true; }
+    if (!expanded) {
+      setExpanded(true);
+      openedByHover = true;
+    }
   });
   menu.addEventListener('pointerleave', event => {
     if (event.pointerType !== 'mouse') return;
@@ -113,19 +146,27 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
   });
   menu.addEventListener('focusout', () => {
     setTimeout(() => {
-      if (!menu.contains(document.activeElement)) { setExpanded(false); openedByHover = false; }
+      if (!menu.contains(document.activeElement)) {
+        setExpanded(false);
+        openedByHover = false;
+      }
     }, 0);
   });
   menu.addEventListener('keydown', event => {
     if (event.key === 'Escape' && expanded) {
       setExpanded(false);
       openedByHover = false;
-      trigger.focus({ preventScroll: true });
+      trigger.focus({
+        preventScroll: true
+      });
       event.preventDefault();
     }
   });
   document.addEventListener('pointerdown', event => {
-    if (!menu.contains(event.target)) { setExpanded(false); openedByHover = false; }
+    if (!menu.contains(event.target)) {
+      setExpanded(false);
+      openedByHover = false;
+    }
   });
   reducedMotion.addEventListener('change', () => {
     if (reducedMotion.matches && animation) animation.finish();
