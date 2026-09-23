@@ -1257,7 +1257,7 @@ body:has(> .fcc) {
     height:250px
   }
 }
-/* Lucide SVG icons from the web; decorative labels remain accessible. */
+/* Local SVG icons keep navigation consistent without a third-party request. */
 .fcc .fcc-icon {
   display:inline-block;
   width:1.15em;
@@ -1269,25 +1269,25 @@ body:has(> .fcc) {
   mask:var(--fcc-icon-url) center/contain no-repeat
 }
 .fcc-icon-arrow-up-right {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/arrow-up-right.svg")
+  --fcc-icon-url:url("assets/icons/arrow-up-right.svg")
 }
 .fcc-icon-arrow-up {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/arrow-up.svg")
+  --fcc-icon-url:url("assets/icons/arrow-up.svg")
 }
 .fcc-icon-arrow-down {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/arrow-down.svg")
+  --fcc-icon-url:url("assets/icons/arrow-down.svg")
 }
 .fcc-icon-chevron-down {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/chevron-down.svg")
+  --fcc-icon-url:url("assets/icons/chevron-down.svg")
 }
 .fcc-icon-house {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/house.svg")
+  --fcc-icon-url:url("assets/icons/house.svg")
 }
 .fcc-icon-sparkles {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/sparkles.svg")
+  --fcc-icon-url:url("assets/icons/sparkles.svg")
 }
 .fcc-icon-quote {
-  --fcc-icon-url:url("https://cdn.jsdelivr.net/npm/lucide-static@0.468.0/icons/quote.svg")
+  --fcc-icon-url:url("assets/icons/quote.svg")
 }
 .fcc-review-placeholder>.fcc-icon,.fcc-review-placeholder>span .fcc-icon {
   width:40px;
@@ -2220,3 +2220,84 @@ html.fcc-popup-open {
 @media (max-width: 600px) {
   .fcc-blog-grid, .fcc-footer-links { grid-template-columns: 1fr; }
 }
+
+/* About page: readable story sections and a practical showroom invitation. */
+.fcc-about-story, .fcc-about-visit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: clamp(28px, 6vw, 90px);
+  align-items: start;
+}
+.fcc-about-story p + p { margin-top: 18px; }
+.fcc-about-story > div > p:not(.fcc-eyebrow),
+.fcc-about-visit > div > p:not(.fcc-eyebrow) { max-width: 65ch; color: var(--muted); }
+.fcc-about-story .fcc-button { margin-top: 24px; }
+.fcc-about-selection { background: #f3e5e4; }
+.fcc-about-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 32px; }
+.fcc-about-cards article { padding: 28px; background: var(--cream); border: 1px solid var(--line); border-radius: 16px; }
+.fcc-about-cards h3 { font-size: 23px; margin-bottom: 16px; }
+.fcc-about-cards p { color: var(--muted); margin-bottom: 22px; }
+.fcc-about-visit { border-top: 1px solid var(--line); }
+.fcc-about-visit h2 { margin-bottom: 24px; }
+.fcc-about-visit-details { padding: 32px; border-radius: 16px; background: #f3e5e4; }
+.fcc-about-visit-details h3 { margin-bottom: 18px; }
+.fcc-about-visit-details address { font-style: normal; }
+.fcc-about-visit-details p { margin: 18px 0; }
+@media (max-width: 850px) {
+  .fcc-about-story, .fcc-about-visit, .fcc-about-cards { grid-template-columns: 1fr; }
+}
+
+/* Search sits above the results on the right, with room for narrow screens. */
+.fcc-catalog-search {
+  width: min(100%, 340px);
+  margin: 0 0 24px auto;
+}
+.fcc-catalog-search label {
+  display: block;
+  margin-bottom: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.fcc-catalog-search input {
+  width: 100%;
+}
+@media (max-width: 680px) {
+  .fcc-catalog-search { width: 100%; }
+}
+
+/* Soft, photo-led About page with the brand colour reserved for accents. */
+.fcc-about-page {
+  --cream: #faf7f2;
+  --ink: #443c38;
+  --muted: #70645e;
+  --green: #89515a;
+  --line: #e5dcd4;
+  background: var(--cream);
+}
+.fcc-about-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 80px);
+  background: #f0e8e0;
+}
+.fcc-about-hero h1 { font-size: clamp(42px, 5.5vw, 76px); line-height: 1.05; }
+.fcc-about-hero p:not(.fcc-eyebrow) { max-width: 43ch; margin: 24px 0; color: var(--muted); }
+.fcc-about-page figure img { height: auto; aspect-ratio: 6 / 5; border-radius: 22px; object-fit: cover; }
+.fcc-about-page figcaption { margin-top: 8px; font-size: 11px; color: var(--muted); }
+.fcc-about-page .fcc-about-story { align-items: center; }
+.fcc-about-page .fcc-about-story h2 { margin-bottom: 24px; }
+.fcc-about-page .fcc-text-link { display: inline-block; margin-top: 16px; }
+.fcc-about-page .fcc-about-selection { background: #eeeae2; }
+.fcc-about-page .fcc-about-visit-details { background: #efe5e1; }
+.fcc-about-page .fcc-page-cta { background: #eee8df; }
+.fcc-about-page .fcc-button { border-radius: 10px; }
+@media (max-width: 850px) {
+  .fcc-about-hero { grid-template-columns: 1fr; }
+  .fcc-about-page figure img { aspect-ratio: 4 / 3; }
+}
+
+.fcc-icon-arrow-left { --fcc-icon-url: url("assets/icons/arrow-left.svg"); }
+.fcc-icon-arrow-right { --fcc-icon-url: url("assets/icons/arrow-right.svg"); }
+.fcc-header .fcc-nav-cta .fcc-icon { width: 18px; height: 18px; }
+.fcc-products-menu > summary .fcc-icon { width: 14px; height: 14px; }

@@ -6,7 +6,8 @@
     <meta name="description" content="Products — First Choice Carpets, serving Toronto, Ontario.">
     <title>Products | First Choice Carpets</title>
     <link rel="stylesheet" href="styles.css">
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=fc-mark-2">
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=fc-3">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=fc-3">
   </head>
   <body>
     <!-- WORDPRESS CONTENT START -->
@@ -16,7 +17,7 @@
       <header class="fcc-header"><a class="fcc-brand" href="index.html" aria-label="First Choice Carpets home"><span class="fcc-mark" aria-hidden="true">FC<span></span></span><span>FIRST CHOICE<small>CARPETS &amp; FLOORING</small></span></a>
         <nav aria-label="Main navigation"><a href="index.html">Home</a>
           <details class="fcc-products-menu">
-            <summary>Products <span aria-hidden="true">⌄</span></summary>
+            <summary>Products <span aria-hidden="true"><i class="fcc-icon fcc-icon-chevron-down" aria-hidden="true"></i></span></summary>
             <div class="fcc-mega fcc-flyout">
               <div class="fcc-category-list">
                 <details class="fcc-category-menu" open>
@@ -135,7 +136,7 @@
               <div class="fcc-mega-footer"><a class="fcc-text-link" href="products.html" aria-current="page">View all products</a>
               </div>
             </div>
-          </details><a href="services.html">Services</a><a href="about.html">About Us</a><a href="gallery.html">Gallery</a><a href="faq.html">FAQ</a><a class="fcc-button fcc-button-small" href="contact.html">Contact <span aria-hidden="true">↗</span></a>
+          </details><a href="services.html">Services</a><a href="about.html">About Us</a><a href="gallery.html">Gallery</a><a href="faq.html">FAQ</a><a class="fcc-button fcc-button-small" href="contact.html">Contact <span aria-hidden="true"><i class="fcc-icon fcc-icon-arrow-up-right" aria-hidden="true"></i></span></a>
         </nav>
       </header>
       <main id="fcc-main">
@@ -146,10 +147,6 @@
         </section>
         <section class="fcc-section fcc-catalog" aria-label="Flooring catalogue">
           <aside class="fcc-filters" aria-label="Product filters">
-            <div class="fcc-filter-box">
-              <label for="fcc-product-search">Search products</label>
-              <input id="fcc-product-search" type="search" placeholder="Try oak, carpet, grey…" disabled>
-            </div>
             <div class="fcc-filter-box">
               <h2>Categories</h2>
               <div class="fcc-category-buttons">
@@ -172,6 +169,10 @@
               <p>Enable JavaScript to view the catalogue, or contact us for product information.</p></noscript>
           </aside>
           <div class="fcc-catalog-results">
+            <div class="fcc-catalog-search" role="search" aria-label="Search products">
+              <label for="fcc-product-search">Search products</label>
+              <input id="fcc-product-search" type="search" placeholder="Try oak, carpet, grey…" disabled>
+            </div>
             <div class="fcc-catalog-toolbar">
               <p id="fcc-product-count" role="status" aria-live="polite">Loading products…</p>
               <div>
@@ -198,14 +199,14 @@
               <p>Try a different search or reset your filters.</p>
             </div>
             <div class="fcc-pagination" id="fcc-pagination" hidden>
-              <button type="button" id="fcc-previous">← Previous</button><span id="fcc-page-label"></span>
-              <button type="button" id="fcc-next">Next →</button>
+              <button type="button" id="fcc-previous"><i class="fcc-icon fcc-icon-arrow-left" aria-hidden="true"></i> Previous</button><span id="fcc-page-label"></span>
+              <button type="button" id="fcc-next">Next <i class="fcc-icon fcc-icon-arrow-right" aria-hidden="true"></i></button>
             </div>
           </div>
         </section>
       </main>
       <footer class="fcc-footer"><a class="fcc-brand" href="index.html"><span class="fcc-mark" aria-hidden="true">FC<span></span></span><span>FIRST CHOICE<small>CARPETS &amp; FLOORING</small></span></a>
-        <p>First Choice is Your <em class="fcc-green-word">Green</em> Choice for Flooring!</p><a href="#fcc-home">Back to top ↑</a>
+        <p>First Choice is Your <em class="fcc-green-word">Green</em> Choice for Flooring!</p><a href="#fcc-home">Back to top <i class="fcc-icon fcc-icon-arrow-up" aria-hidden="true"></i></a>
         <nav class="fcc-footer-links" aria-label="Footer navigation">
           <div><h3>Shop products</h3><a href="products.html">All products</a><a href="products.html?category=carpet">Carpet</a><a href="products.html?category=engineered-hardwood">Hardwood</a><a href="products.html?category=laminate">Laminate</a><a href="products.html?category=vinyl">Vinyl</a></div>
           <div><h3>Learning centre</h3><a href="blog.html">Blog</a><a href="faq.html">FAQs</a></div>

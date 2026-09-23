@@ -45,9 +45,20 @@
         if (id) {
           document.getElementById('blog-heading').textContent = item.title;
           document.title = item.title + ' | First Choice Carpets';
+          document.querySelector('meta[name="description"]').content = item.description;
           posts.classList.add('fcc-blog-article');
           for (const paragraph of item.content.split(/\n\s*\n/)) body.append(element('p', paragraph));
           const back = element('a', 'Back to all articles');
+          const related = element('nav');
+          related.setAttribute('aria-label', 'Plan your flooring project');
+          for (const [label, href] of [['Explore flooring', 'products.html'], ['Installation services', 'services.html'], ['Visit our Brampton showroom', 'contact.html']]) {
+            const link = element('a', label);
+            link.href = href;
+            const paragraph = element('p');
+            paragraph.append(link);
+            related.append(paragraph);
+          }
+          body.append(related);
           back.href = 'blog.html';
           body.append(back);
         } else {
