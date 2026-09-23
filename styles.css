@@ -204,3 +204,21 @@ body:has(> .fcc){margin:0}
 
 /* Category updates must not anchor the viewport to moving cards or the footer. */
 html.fcc-catalogue-page{overflow-anchor:none}
+/* Product detail modal; native dialog keeps keyboard focus inside the popup. */
+html.fcc-popup-open{overflow:hidden;scrollbar-gutter:stable}
+.fcc .fcc-view-details{width:100%;justify-content:center;margin-top:22px}
+.fcc .fcc-product-popup{position:fixed;inset:0;margin:auto;width:min(940px,calc(100vw - 40px));max-height:calc(100dvh - 48px);padding:0;border:1px solid #e1d4ce;border-radius:16px;background:#faf8f3;color:var(--ink);box-shadow:0 28px 100px #0006;overflow:auto;overscroll-behavior:contain}
+.fcc-product-popup::backdrop{background:#17131099;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.fcc-product-popup[open]{animation:fcc-popup-enter .22s ease-out}
+.fcc-popup-layout{display:grid;grid-template-columns:1fr 1fr}
+.fcc .fcc-popup-image{width:100%;height:100%;min-height:380px;max-height:650px;object-fit:contain;background:#ece7df}
+.fcc-popup-content{padding:56px 34px 36px;min-width:0}
+.fcc .fcc-popup-content h2{font-size:clamp(28px,4vw,44px);overflow-wrap:anywhere}
+.fcc-popup-content .fcc-cms-description{margin:24px 0;line-height:1.75;font-size:15px}
+.fcc-popup-content .fcc-button{margin-top:12px}
+.fcc-popup-no-image{grid-template-columns:1fr}
+.fcc .fcc-popup-close{position:absolute;right:12px;top:12px;z-index:1;width:38px;height:38px;border:1px solid #d8cec6;border-radius:50%;background:#fff;color:#342b27;font:26px/1 Arial,sans-serif;cursor:pointer;box-shadow:0 2px 8px #0001}
+.fcc-popup-close:hover{background:#eee8e2}
+@keyframes fcc-popup-enter{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@media(max-width:680px){.fcc .fcc-product-popup{width:calc(100vw - 24px);max-height:calc(100dvh - 24px)}.fcc-popup-layout{grid-template-columns:1fr}.fcc .fcc-popup-image{min-height:0;height:240px}.fcc-popup-content{padding:30px 24px}.fcc-popup-no-image .fcc-popup-content{padding-top:56px}}
+@media(prefers-reduced-motion:reduce){.fcc-product-popup[open]{animation:none}}

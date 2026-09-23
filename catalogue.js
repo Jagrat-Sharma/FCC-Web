@@ -5,6 +5,42 @@
   const search = $('fcc-product-search'), sort = $('fcc-product-sort'), size = $('fcc-page-size');
   let page = 1, controller, categoriesReady = false;
   const element = (tag, text, cls) => { const e = document.createElement(tag); if (text !== undefined) e.textContent = text; if (cls) e.className = cls; return e; };
+  const popup = element('dialog', undefined, 'fcc-product-popup');
+  popup.setAttribute('aria-labelledby', 'fcc-popup-title');
+  document.querySelector('.fcc').append(popup);
+  let popupTrigger;
+  // Close through the backdrop or explicit close button, not Escape.
+  popup.addEventListener('cancel', event => event.preventDefault());
+  popup.addEventListener('close', () => {
+    document.documentElement.classList.remove('fcc-popup-open');
+    if (popupTrigger?.isConnected) popupTrigger.focus({ preventScroll: true });
+  });
+  let backdropPress = false;
+  const outsidePopup = event => {
+    const rect = popup.getBoundingClientRect();
+    return event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom;
+  };
+  popup.addEventListener('pointerdown', event => { backdropPress = outsidePopup(event); });
+  popup.addEventListener('click', event => { if (backdropPress && outsidePopup(event)) popup.close(); backdropPress = false; });
+  function showProduct(item, trigger) {
+    popupTrigger = trigger;
+    const close = element('button', '×', 'fcc-popup-close');
+    close.type = 'button'; close.setAttribute('aria-label', 'Close product details'); close.autofocus = true;
+    close.onclick = () => popup.close();
+    const layout = element('div', undefined, 'fcc-popup-layout');
+    if (item.image_url) { const image = element('img', undefined, 'fcc-popup-image'); image.src = item.image_url; image.alt = item.image_alt || item.name; layout.append(image); }
+    else layout.classList.add('fcc-popup-no-image');
+    const content = element('div', undefined, 'fcc-popup-content');
+    const title = element('h2', item.name); title.id = 'fcc-popup-title';
+    content.append(element('p', item.category_name, 'fcc-eyebrow'), title);
+    if (item.featured) content.append(element('p', 'Featured product', 'fcc-small'));
+    if (item.price_cents != null) content.append(element('p', new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(item.price_cents / 100) + ' CAD ' + item.price_unit, 'fcc-cms-price'));
+    content.append(element('p', item.description || 'Contact our team for product details.', 'fcc-cms-description'));
+    const link = element('a', 'Enquire about this product', 'fcc-button');
+    link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name);
+    content.append(link); layout.append(content); popup.replaceChildren(close, layout);
+    document.documentElement.classList.add('fcc-popup-open'); popup.showModal(); popup.scrollTop = 0;
+  }
   async function json(url, signal) { const r = await fetch(url, { signal }); if (!r.ok || !r.headers.get('content-type')?.includes('application/json')) throw new Error('Products are temporarily unavailable. Please try again or contact us.'); return r.json(); }
   async function load() {
     controller?.abort(); controller = new AbortController(); const signal = controller.signal;
@@ -29,8 +65,10 @@
         const body = element('div', undefined, 'fcc-card-body'); body.append(element('p', item.category_name, 'fcc-card-category'), element('h2', item.name));
         if (item.featured) body.append(element('p', 'Featured', 'fcc-small'));
         if (item.price_cents !== null) body.append(element('p', new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(item.price_cents / 100) + ' CAD ' + item.price_unit, 'fcc-cms-price'));
-        const details = element('details', undefined, 'fcc-product-details'), content = element('div'); details.append(element('summary', 'View details +')); content.append(element('p', item.description || 'Contact our team for product details.', 'fcc-cms-description'));
-        const link = element('a', 'Enquire about this product', 'fcc-button'); link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name); content.append(link); details.append(content); body.append(details); card.append(body); nextCards.append(card);
+        const details = element('button', 'View details', 'fcc-button fcc-view-details');
+        details.type = 'button'; details.setAttribute('aria-haspopup', 'dialog'); details.setAttribute('aria-label', 'View details for ' + item.name);
+        details.onclick = () => showProduct(item, details);
+        body.append(details); card.append(body); nextCards.append(card);
       }
       // One DOM update avoids temporarily collapsing the catalogue under the viewport.
       const viewport = { left: window.scrollX, top: window.scrollY, behavior: 'instant' };
