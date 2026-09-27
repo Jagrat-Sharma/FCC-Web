@@ -201,7 +201,7 @@ form.onsubmit = async e => {
     })
   };
   if (kind === 'products') Object.assign(data, {
-    colours: [...document.querySelectorAll('.colour-row')].map(row => ({ name: row.querySelector('[data-colour-name]').value, code: row.querySelector('[data-colour-code]').value, image_id: row.dataset.imageId || null })),
+    colours: [...document.querySelectorAll('.colour-row')].map(row => ({ name: row.querySelector('[data-colour-name]').value, code: row.querySelector('[data-colour-code]').value, image_id: row.dataset.imageId || null, source_image_url: row.dataset.sourceImageUrl || '' })),
     brand: field('brand').value, specifications: Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value])),
     name: field('name').value, category_id: field('category_id').value, price_cents: current?.price_cents ?? null, price_unit: current?.price_unit ?? '', featured: field('featured').checked
   });
@@ -302,6 +302,7 @@ field('category_id').addEventListener('change', () => {
 function addColour(colour = {}) {
   const row = node('div', undefined, 'colour-row');
   row.dataset.imageId = colour.image_id || '';
+  row.dataset.sourceImageUrl = colour.source_image_url || '';
   for (const [key, title] of [['name', 'Colour name'], ['code', 'Colour code']]) {
     const label = node('label', title);
     const input = node('input');
@@ -315,8 +316,8 @@ function addColour(colour = {}) {
   const image = node('img');
   image.alt = 'Colour swatch preview';
   const previewColour = () => {
-    image.hidden = !row.dataset.imageId;
-    if (row.dataset.imageId) image.src = '/api/admin/media/' + row.dataset.imageId + '/file';
+    image.hidden = !row.dataset.imageId && !row.dataset.sourceImageUrl;
+    image.src = row.dataset.imageId ? '/api/admin/media/' + row.dataset.imageId + '/file' : row.dataset.sourceImageUrl;
   };
   previewColour();
   const label = node('label', 'Swatch image');
@@ -339,7 +340,7 @@ function addColour(colour = {}) {
   label.append(upload);
   const removeImage = node('button', 'Remove swatch image');
   removeImage.type = 'button';
-  removeImage.onclick = () => { row.dataset.imageId = ''; previewColour(); };
+  removeImage.onclick = () => { row.dataset.imageId = ''; row.dataset.sourceImageUrl = ''; previewColour(); };
   const remove = node('button', 'Remove colour');
   remove.type = 'button';
   remove.onclick = () => row.remove();

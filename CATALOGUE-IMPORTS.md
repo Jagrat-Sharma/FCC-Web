@@ -15,3 +15,5 @@ Migration 0005 inserts once with a fixed ID and does not overwrite later admin e
 ## Colour swatches
 
 Apply migrations before deploying: `npx wrangler d1 migrations apply fcc-cms --remote`. Each product has one shared description and up to 100 colours with a name, optional code and optional R2 image. Selecting a colour in product details changes the image and enquiry subject. Colours without uploaded images display names and an image-pending message. Draft swatch images are private and referenced swatch images cannot be deleted from the media library.
+
+Migration 0007 attaches the nine original manufacturer-hosted JPEG URLs. Downloads were blocked in the development environment; these are external references, not R2 copies, and image loading remains unverified. Uploading a replacement in Admin overrides the external image. This depends on the manufacturer keeping the URLs accessible.

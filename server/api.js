@@ -26,12 +26,12 @@ function pageOptions(url) {
 }
 function itemView(row) {
   return {
-    ...row, ...(row.colours !== undefined ? { colours: JSON.parse(row.colours).map(c => ({ ...c, image_url: c.image_id ? '/media/' + c.image_id : null })) } : {}), ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
+    ...row, ...(row.colours !== undefined ? { colours: JSON.parse(row.colours).map(c => ({ ...c, image_url: c.image_id ? '/media/' + c.image_id : c.source_image_url || null })) } : {}), ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
       featured: !!row.featured
     }
     : {
     }),
-    image_url: row.image_id ? `/media/${row.image_id}` : null
+    image_url: row.image_id ? `/media/${row.image_id}` : (row.colours ? JSON.parse(row.colours).map(c => c.image_id ? '/media/' + c.image_id : c.source_image_url).find(Boolean) || null : null)
   };
 }
 async function listItems(env, url, kind, admin) {
