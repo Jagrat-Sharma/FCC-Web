@@ -2,6 +2,7 @@ import {
   authenticate
 }
 from './auth.js';
+import { manufacturerImageOrigins } from './manufacturer-images.js';
 import {
   failure, HttpError
 }
@@ -20,7 +21,7 @@ export async function handleAdmin({
     headers.set('Cache-Control', 'no-store');
     headers.set('X-Robots-Tag', 'noindex, nofollow');
     headers.set('X-Content-Type-Options', 'nosniff');
-    headers.set('Content-Security-Policy', "default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: https://canada.beaulieucanada.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    headers.set('Content-Security-Policy', `default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: ${manufacturerImageOrigins.join(' ')}; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'`);
     return new Response(response.body, {
       status: response.status, headers
     });

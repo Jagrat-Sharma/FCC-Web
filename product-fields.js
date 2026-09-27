@@ -8,8 +8,11 @@ export const labels = {
   size: 'Tile / product size', application: 'Recommended use', compatibility: 'Compatible flooring'
 };
 export const categoryFields = {
-  carpet: ['color', 'material', 'length', 'width', 'construction', 'pile', 'backing'],
-  'carpet-tiles': ['color', 'material', 'size', 'thickness', 'backing', 'coverage', 'installation'],
+  carpet: ['color', 'material', 'length', 'width', 'thickness', 'construction', 'pile', 'backing'],
+  'carpet-tiles': ['color', 'material', 'construction', 'size', 'thickness', 'backing', 'coverage', 'installation'],
+  rugs: ['color', 'material', 'size', 'width', 'length', 'construction', 'pile', 'backing'],
+  linoleum: ['color', 'material', 'width', 'length', 'thickness', 'finish', 'installation'],
+  'commercial-matting': ['color', 'material', 'construction', 'width', 'length', 'thickness', 'backing', 'application'],
   'engineered-hardwood': ['color', 'species', 'length', 'width', 'thickness', 'wear_layer', 'finish', 'coverage', 'installation'],
   'solid-hardwood': ['color', 'species', 'length', 'width', 'thickness', 'finish', 'coverage', 'installation'],
   laminate: ['color', 'length', 'width', 'coverage', 'thickness', 'rating', 'finish', 'water_resistance', 'installation'],

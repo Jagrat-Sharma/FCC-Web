@@ -5,9 +5,11 @@ import {
 }
 from 'node:sqlite';
 import {
-  readFileSync
+  readFileSync, readdirSync
 }
 from 'node:fs';
+import { categoryFields } from '../product-fields.js';
+import { isManufacturerImage, manufacturerImageOrigins } from '../server/manufacturer-images.js';
 import {
   handleAPI, mediaResponse
 }
@@ -365,4 +367,69 @@ test('blog CRUD enforces drafts, validation, conflicts and referenced cover prot
   assert.equal((await call('/api/blogs/' + item.id)).status, 404);
   assert.equal((await call('/api/admin/media/' + image.id, 'DELETE', {})).status, 200);
   env.sql.close();
+});
+test('reviewed catalogue migration preserves existing work and all colour choices', async () => {
+  const env = setup();
+  const batch = JSON.parse(readFileSync(new URL('../catalogue-imports/2026-09-27.json', import.meta.url), 'utf8'));
+  const migration = readFileSync(new URL('../migrations/0008_reviewed_catalogue_batch.sql', import.meta.url), 'utf8');
+  const call = (path, method, body) => handleAPI({ env, request: req(path, method, body) });
+  env.sql.exec(migration);
+  assert.equal(env.sql.prepare('SELECT count(*) AS n FROM products').get().n, 25);
+  assert.equal((await (await call('/api/products')).json()).total, 0);
+  assert.deepEqual((await (await call('/api/brands')).json()).items, []);
+  const admin = await (await call('/api/admin/products?limit=50')).json();
+  assert.equal(admin.total, batch.products.length);
+  for (const expected of batch.products) {
+    const item = admin.items.find(p => p.name === expected.name && p.brand === expected.brand);
+    assert.ok(item, expected.name);
+    assert.equal(item.published, false);
+    assert.deepEqual(item.specifications, expected.specifications);
+    assert.equal(item.colours.length, expected.colours.length);
+    for (const key of Object.keys(item.specifications)) {
+      assert.ok(categoryFields[item.category_id].includes(key), item.name + ': admin must preserve ' + key);
+    }
+    // Editing a seeded entry must preserve its swatches, including exact external URLs.
+    const saved = await call('/api/admin/products/' + item.id, 'PUT', item);
+    assert.equal(saved.status, 200, item.name);
+    assert.deepEqual((await saved.json()).item.colours, item.colours);
+    for (const colour of item.colours) {
+      if (colour.source_image_url) {
+        assert.ok(isManufacturerImage(colour.source_image_url));
+        assert.ok(manufacturerImageOrigins.includes(new URL(colour.source_image_url).origin));
+      }
+    }
+  }
+  const shaw = admin.items.find(p => p.brand === 'Shaw Floors');
+  const edited = { ...shaw, name: 'Client-edited Classic Tone', published: true, version: 2 };
+  assert.equal((await call('/api/admin/products/' + shaw.id, 'PUT', edited)).status, 200);
+  env.sql.exec(migration);
+  assert.equal(env.sql.prepare('SELECT count(*) AS n FROM products').get().n, 25);
+  const publicProducts = await (await call('/api/products?brand=Shaw%20Floors')).json();
+  assert.equal(publicProducts.total, 1);
+  assert.equal(publicProducts.items[0].name, edited.name);
+  assert.equal(publicProducts.items[0].colours.length, 35);
+  assert.ok(publicProducts.items[0].image_url.startsWith('https://shawfloors.widen.net/'));
+
+  const malicious = ['https://example.com/swatch.jpg', 'javascript:alert(1)', 'https://shawfloors.widen.net/other.jpg', shaw.colours[0].source_image_url + '&redirect=https://example.com'];
+  for (const source_image_url of malicious) {
+    assert.equal((await call('/api/admin/products', 'POST', {
+      ...shaw, colours: [{ name: 'Unsafe', code: '', image_id: null, source_image_url }]
+    })).status, 400);
+  }
+  env.sql.close();
+});
+
+test('all migrations apply together without duplicating Strong Intuition', () => {
+  const sql = new DatabaseSync(':memory:');
+  const migrations = new URL('../migrations/', import.meta.url);
+  for (const name of readdirSync(migrations).filter(name => name.endsWith('.sql')).sort()) {
+    sql.exec(readFileSync(new URL(name, migrations), 'utf8'));
+  }
+  assert.deepEqual(sql.prepare('PRAGMA foreign_key_check').all(), []);
+  assert.equal(sql.prepare('SELECT count(*) AS n FROM products').get().n, 26);
+  const beaulieu = sql.prepare('SELECT * FROM products WHERE id = ?').get('14c12ec4-a886-4501-8df9-ed3e2be9d964');
+  assert.equal(JSON.parse(beaulieu.colours).length, 9);
+  assert.equal(sql.prepare('SELECT count(*) AS n FROM products WHERE published = 1').get().n, 0);
+  assert.equal(sql.prepare('SELECT count(*) AS n FROM products, json_each(products.colours)').get().n, 352);
+  sql.close();
 });

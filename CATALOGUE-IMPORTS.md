@@ -1,5 +1,9 @@
 # Catalogue imports
 
+## First multi-brand batch — 2026-09-27
+
+See [CATALOGUE-BATCH-1.md](CATALOGUE-BATCH-1.md) for the 25 new drafts, 343 colour choices, sources, image gaps, deferred catalogues and deployment instructions. Migration 0008 preserves the existing Strong Intuition entry and all subsequent admin edits. No remote database changes have been made.
+
 ## Beaulieu Canada — Strong Intuition J5436
 
 Prepared as one draft product with nine colour names/codes in its description. Manufacturer/company: Beaulieu Canada. Manufacturer brand: Tryesse. Collection: Tryesse Pro. Source checked 2026-09-27:
