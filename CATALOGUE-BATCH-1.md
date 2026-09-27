@@ -27,15 +27,15 @@ Migration `migrations/0008_reviewed_catalogue_batch.sql` adds these products as 
 2. Open Products; search for a product name from the table below.
 3. Review specifications and colour names against your supplier's current information.
 4. Upload a product image and any missing colour swatches. Uploaded images use the existing R2 workflow.
-5. Enable **Display on website**, then save, only when that product is ready.
+5. Save the product. Return to the overview and enable **Display on website** when ready; that switch saves immediately.
 
 Brand filters use the imported brand names. A draft brand does not appear publicly until at least one of its products is published. Area Rugs, Linoleum and Commercial Matting have been added as proper categories rather than misclassifying those products as vinyl.
 
 ## Image status
 
-**36 manufacturer image references** were attached: all 35 Classic Tone colours and Paris Oak in Olympic 5. These are external URLs, not downloaded R2 files. Most are small manufacturer thumbnails; replace them with higher-resolution swatches when available. Deployed image loading has not been visually verified.
+**305 manufacturer image references** are now attached after migration `0009_catalogue_images.sql`: the original 36 plus 269 additional matching swatches. These are external URLs, not downloaded R2 files. Some are small manufacturer thumbnails; replace them with higher-resolution swatches when available. Deployed image loading has not been visually verified. See [image setup and admin instructions](IMAGE-IMPORT.md).
 
-**307 colour choices still have no image.** They remain selectable by name; the product popup shows “Swatch image coming soon” instead of displaying another colour's photograph. No substitute or guessed swatch images were added. Existing Strong Intuition's nine external URLs remain unchanged.
+**38 colour choices still have no image:** Dye Lab (12), Traced (10), Hydrasafe (9), Rare Vintage (6), and Coastal Driftwood (1). They remain selectable by name; the product popup shows “Swatch image coming soon” instead of displaying another colour's photograph. No substitute or guessed swatch images were added. Existing Strong Intuition's nine external URLs remain unchanged.
 
 The server accepts only the exact reviewed new image URLs plus the existing Beaulieu list. Arbitrary external URLs remain rejected. The admin image policy allows the corresponding manufacturer origins.
 

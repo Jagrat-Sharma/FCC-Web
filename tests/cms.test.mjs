@@ -9,6 +9,7 @@ import {
 }
 from 'node:fs';
 import { categoryFields } from '../product-fields.js';
+import { downloadImage } from '../server/image-import.js';
 import { isManufacturerImage, manufacturerImageOrigins } from '../server/manufacturer-images.js';
 import {
   handleAPI, mediaResponse
@@ -419,6 +420,52 @@ test('reviewed catalogue migration preserves existing work and all colour choice
   env.sql.close();
 });
 
+test('image link imports enforce authorization, safe destinations, file limits and private storage', async () => {
+  const env = setup();
+  const originalFetch = globalThis.fetch;
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aHoQAAAAASUVORK5CYII=', 'base64');
+  const url = 'https://torlys.com/image.png';
+  let calls = 0;
+  let response = () => new Response(png, { headers: { 'Content-Type': 'image/png' } });
+  globalThis.fetch = async (target, options) => {
+    if (target === base.ACCESS_TEAM_DOMAIN + '/cdn-cgi/access/certs') return originalFetch(target);
+    calls++;
+    assert.equal(options.redirect, 'manual');
+    assert.deepEqual(Object.keys(options.headers), ['Accept']);
+    return response();
+  };
+  try {
+    const call = (jwt = valid, headers = {}) => handleAPI({ env, request: req('/api/admin/media/import', 'POST', { url }, jwt, headers) });
+    assert.equal((await call(null)).status, 401);
+    assert.equal((await call(valid, { Origin: 'https://evil.example' })).status, 403);
+    assert.equal(calls, 0);
+    for (const blocked of ['http://torlys.com/a.png', 'https://127.0.0.1/a.png', 'https://localhost/a.png', 'https://evil.example/a.png', 'https://user:pass@torlys.com/a.png', 'https://torlys.com:444/a.png']) {
+      await assert.rejects(() => downloadImage(blocked), e => e.status === 400);
+    }
+    assert.equal(calls, 0);
+    const imported = await call();
+    assert.equal(imported.status, 201);
+    const { item } = await imported.json();
+    assert.equal(env.objects.size, 1);
+    await assert.rejects(() => mediaResponse(req('/media/' + item.id), env, item.id), e => e.status === 404);
+    assert.equal((await mediaResponse(req('/api/admin/media/' + item.id + '/file'), env, item.id, true)).status, 200);
+    response = () => new Response(null, { status: 302, headers: { Location: 'https://127.0.0.1/private' } });
+    await assert.rejects(() => downloadImage(url), e => e.status === 400);
+    response = () => new Response('<svg/>', { headers: { 'Content-Type': 'image/png' } });
+    await assert.rejects(() => downloadImage(url), e => e.status === 415);
+    response = () => new Response(png, { headers: { 'Content-Type': 'image/png', 'Content-Length': '5242881' } });
+    await assert.rejects(() => downloadImage(url), e => e.status === 413);
+    response = () => new Response(new Uint8Array(5242881), { headers: { 'Content-Type': 'image/png' } });
+    await assert.rejects(() => downloadImage(url), e => e.status === 413);
+    response = () => new Response(null, { status: 302, headers: { Location: url } });
+    await assert.rejects(() => downloadImage(url), e => e.status === 400);
+    assert.equal(env.objects.size, 1);
+  } finally {
+    globalThis.fetch = originalFetch;
+    env.sql.close();
+  }
+});
+
 test('all migrations apply together without duplicating Strong Intuition', () => {
   const sql = new DatabaseSync(':memory:');
   const migrations = new URL('../migrations/', import.meta.url);
@@ -431,5 +478,10 @@ test('all migrations apply together without duplicating Strong Intuition', () =>
   assert.equal(JSON.parse(beaulieu.colours).length, 9);
   assert.equal(sql.prepare('SELECT count(*) AS n FROM products WHERE published = 1').get().n, 0);
   assert.equal(sql.prepare('SELECT count(*) AS n FROM products, json_each(products.colours)').get().n, 352);
+  const imageCount = () => sql.prepare("SELECT count(*) AS n FROM products, json_each(products.colours) WHERE coalesce(json_extract(value, '$.source_image_url'), '') <> ''").get().n;
+  assert.equal(imageCount(), 314); // 305 batch swatches plus nine existing Beaulieu swatches.
+  const before = sql.prepare('SELECT id, colours, version FROM products ORDER BY id').all();
+  sql.exec(readFileSync(new URL('0009_catalogue_images.sql', migrations), 'utf8'));
+  assert.deepEqual(sql.prepare('SELECT id, colours, version FROM products ORDER BY id').all(), before);
   sql.close();
 });

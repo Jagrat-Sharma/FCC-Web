@@ -10,6 +10,7 @@ import {
   UUID, record, integer, text, imageType
 }
 from './validation.js';
+import { downloadImage } from './image-import.js';
 const kinds = new Set(['products', 'gallery', 'blogs']);
 const nowSQL = "strftime('%Y-%m-%dT%H:%M:%fZ','now')";
 function idCheck(id) {
@@ -101,13 +102,16 @@ async function saveItem(request, env, kind, id) {
 async function upload(request, env) {
   const bytes = await boundedBody(request, 5 * 1024 * 1024);
   const type = imageType(bytes, request.headers.get('content-type')?.split(';')[0]);
+  return storeImage(env, bytes, type, request.headers.get('X-File-Name'));
+}
+async function storeImage(env, bytes, type, requestedName) {
   const id = crypto.randomUUID();
   const ext = {
     'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp'
   }
   [type];
   const key = `uploads/${id}.${ext}`;
-  const filename = text(request.headers.get('X-File-Name') || `image.${ext}`, 'Filename', 180, true);
+  const filename = text(requestedName || `image.${ext}`, 'Filename', 180, true);
   await env.IMAGES.put(key, bytes, {
     httpMetadata: {
       contentType: type, contentDisposition: `inline; filename="${id}.${ext}"`
@@ -172,6 +176,11 @@ export async function handleAPI({
       });
     }
     if (admin && kind === 'media') {
+      if (id === 'import' && !action && request.method === 'POST') {
+        const { url } = await readJSON(request);
+        const { bytes, type } = await downloadImage(url);
+        return await storeImage(env, bytes, type);
+      }
       if (id && action === 'file') return await mediaResponse(request, env, id, true);
       if (action) throw new HttpError(404, 'Route not found.');
       if (!id && request.method === 'POST') return await upload(request, env);

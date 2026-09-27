@@ -82,6 +82,10 @@
           <label id="blog-content-field" hidden>Article text
             <textarea name="content" rows="14" maxlength="30000" placeholder="Write your article. Separate paragraphs with a blank line."></textarea>
           </label>
+          <label>Image link (optional)
+            <input id="image-link" type="url" maxlength="2048" placeholder="https://manufacturer.com/image.jpg"></label>
+          <button id="import-image" type="button">Add image from link</button>
+          <p class="hint">Paste a direct JPEG, PNG or WebP link from a supported manufacturer. The image is copied to your library; save the item to attach it. Maximum 5 MB.</p>
           <label>Upload / replace image
             <input id="upload" type="file" accept="image/jpeg,image/png,image/webp"></label>
           <p class="hint">JPEG, PNG or WebP, up to 20 MB before optimization. Images are resized for the website. Gallery items require an image.</p><img id="preview" alt="Selected image preview" hidden>

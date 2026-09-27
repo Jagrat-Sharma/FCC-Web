@@ -1,5 +1,5 @@
 // Rebuild only this reviewed import batch. No network or remote database writes.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
 const root = new URL('../', import.meta.url);
@@ -15,10 +15,12 @@ export function productId(key) {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-const urls = [...new Set(batch.products.flatMap(p => p.colours.map(c => c.source_image_url)).filter(Boolean))].sort();
+const additionsPath = new URL('catalogue-imports/reviewed-image-additions.json', root);
+const additions = existsSync(additionsPath) ? JSON.parse(readFileSync(additionsPath, 'utf8')) : [];
+const urls = [...new Set([...batch.products.flatMap(p => p.colours.map(c => c.source_image_url)), ...additions.map(image => image.url)].filter(Boolean))].sort();
 const origins = [...new Set(['https://canada.beaulieucanada.com', ...urls.map(url => new URL(url).origin)])].sort();
 for (const url of urls) {
-  if (!/^https:\/\/(shawfloors\.widen\.net\/content\/|torlys\.com\/wp-content\/uploads\/)/.test(url)) {
+  if (!/^https:\/\/(shawfloors\.widen\.net\/content\/|torlys\.com\/wp-content\/uploads\/|s7d[14]\.scene7\.com\/is\/image\/|res\.cloudinary\.com\/gh\/image\/|www\.vifloor\.com\/wp-content\/uploads\/|www\.shnierflooring\.ca\/catalog\/items\/|scrl\.img\.trykcloudstatic\.com\/designs\/|www\.pentzcommercial\.com\/wp-content\/uploads\/|cdn\.msisurfaces\.com\/images\/|www\.biyorkcanada\.com\/cdn\/shop\/|cdn\.bfldr\.com\/PMOA7OGQ\/|forbo\.azureedge\.net\/productimages\/)/.test(url)) {
     throw new Error('Review the new manufacturer image origin before adding it: ' + url);
   }
 }

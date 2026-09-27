@@ -101,9 +101,12 @@ async function list() {
     $('list-status').textContent = data.total ? `${data.total} ${kind === 'media' ? 'images' : 'items'}` : 'Nothing here yet. Add your first item to get started.';
     for (const item of data.items) {
       const card = node('article', undefined, 'card');
-      if (item.image_id || kind === 'media') {
+      const colourImage = item.colours?.find(colour => colour.image_id || colour.source_image_url);
+      const previewId = item.image_id || (kind === 'media' ? item.id : colourImage?.image_id);
+      const previewURL = previewId ? '/api/admin/media/' + previewId + '/file' : colourImage?.source_image_url;
+      if (previewURL) {
         const img = node('img');
-        img.src = '/api/admin/media/' + (item.image_id || item.id) + '/file';
+        img.src = previewURL;
         img.alt = item.image_alt || '';
         img.loading = 'lazy';
         card.append(img);
@@ -217,6 +220,23 @@ $('upload').onchange = async () => {
     bitmap?.close();
     lock(false);
     $('upload').value = '';
+  }
+};
+// Both URL imports and uploads produce normal private R2 media until published.
+$('import-image').onclick = async () => {
+  if (busy) return;
+  lock(true);
+  $('form-status').textContent = 'Downloading image…';
+  try {
+    const result = await write('media/import', 'POST', { url: $('image-link').value.trim() });
+    imageId = result.item.id;
+    preview();
+    $('image-link').value = '';
+    $('form-status').textContent = 'Image added to your library. Save the item to attach it.';
+  } catch (error) {
+    $('form-status').textContent = error.message;
+  } finally {
+    lock(false);
   }
 };
 form.onsubmit = async e => {
@@ -372,12 +392,37 @@ function addColour(colour = {}) {
   };
   label.append(upload);
   const removeImage = node('button', 'Remove swatch image');
+  const urlLabel = node('label', 'Swatch image link');
+  const urlInput = node('input');
+  urlInput.type = 'url';
+  urlInput.maxLength = 2048;
+  urlInput.placeholder = 'https://manufacturer.com/swatch.jpg';
+  urlLabel.append(urlInput);
+  const importButton = node('button', 'Add swatch from link');
+  importButton.type = 'button';
+  importButton.onclick = async () => {
+    if (busy) return;
+    lock(true);
+    $('form-status').textContent = 'Downloading swatch…';
+    try {
+      const result = await write('media/import', 'POST', { url: urlInput.value.trim() });
+      row.dataset.imageId = result.item.id;
+      row.dataset.sourceImageUrl = '';
+      urlInput.value = '';
+      previewColour();
+      $('form-status').textContent = 'Swatch added. Save the product to apply.';
+    } catch (error) {
+      $('form-status').textContent = error.message;
+    } finally {
+      lock(false);
+    }
+  };
   removeImage.type = 'button';
   removeImage.onclick = () => { row.dataset.imageId = ''; row.dataset.sourceImageUrl = ''; previewColour(); };
   const remove = node('button', 'Remove colour');
   remove.type = 'button';
   remove.onclick = () => row.remove();
-  row.append(image, label, removeImage, remove);
+  row.append(image, label, urlLabel, importButton, removeImage, remove);
   $('colour-rows').append(row);
 }
 $('add-colour').onclick = () => addColour();
