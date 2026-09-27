@@ -38,7 +38,17 @@ export function record(input, kind) {
       const result = text(value, labels[key], 180);
       if (result) clean[key] = result;
     }
+    const colours = input.colours ?? [];
+    if (!Array.isArray(colours) || colours.length > 100) throw new HttpError(400, 'Use up to 100 colours.');
+    const cleanColours = colours.map(colour => {
+      if (!colour || typeof colour !== 'object') throw new HttpError(400, 'Invalid colour.');
+      const image_id = colour.image_id || null;
+      if (image_id && !UUID.test(image_id)) throw new HttpError(400, 'Invalid colour image.');
+      return { name: text(colour.name, 'Colour name', 100, true), code: text(colour.code, 'Colour code', 60), image_id };
+    });
+    if (new Set(cleanColours.map(c => (c.code || c.name).toLowerCase())).size !== cleanColours.length) throw new HttpError(400, 'Colour names or codes must be unique.');
     return {
+      colours: JSON.stringify(cleanColours),
       brand: text(input.brand ?? '', 'Brand / company', 120),
       specifications: JSON.stringify(clean),
       ...common, name: text(input.name, 'Name', 120, true), category_id: text(input.category_id, 'Category', 80, true), price_cents: price, price_unit: input.price_unit, featured: flag(input.featured, 'Featured')

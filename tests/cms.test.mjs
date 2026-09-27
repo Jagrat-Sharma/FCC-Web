@@ -41,6 +41,7 @@ function setup() {
   sql.exec(readFileSync(new URL('../migrations/0001_initial.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../migrations/0002_product_specifications.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../migrations/0003_blog.sql', import.meta.url), 'utf8'));
+  sql.exec(readFileSync(new URL('../migrations/0006_product_colours.sql', import.meta.url), 'utf8'));
   const DB = {
     prepare(query) {
       const statement = sql.prepare(query);
@@ -283,6 +284,17 @@ test('R2 uploads, private draft images, gallery publishing and referenced image 
   await call('/api/admin/gallery/'+item.id,'DELETE',{
     version:3
   });
+  const coloured = { ...product, colours: [{ name: 'Sand', code: 'S01', image_id: image.id }] };
+  const createdColourProduct = await call('/api/admin/products', 'POST', coloured);
+  assert.equal(createdColourProduct.status, 201);
+  const colourProduct = (await createdColourProduct.json()).item;
+  assert.equal(colourProduct.colours[0].image_url, '/media/' + image.id);
+  assert.equal((await call('/api/admin/media/' + image.id, 'DELETE', {})).status, 409);
+  await assert.rejects(() => mediaResponse(req('/media/' + image.id), env, image.id), error => error.status === 404);
+  assert.equal((await call('/api/admin/products/' + colourProduct.id, 'PUT', { ...coloured, published: true, version: 1 })).status, 200);
+  assert.equal((await mediaResponse(req('/media/' + image.id), env, image.id)).status, 200);
+  assert.equal((await call('/api/admin/products', 'POST', { ...coloured, colours: [{ name: '<script>', code: '', image_id: null }] })).status, 400);
+  assert.equal((await call('/api/admin/products/' + colourProduct.id, 'DELETE', { version: 2 })).status, 200);
   assert.equal((await call('/api/admin/media/'+image.id,'DELETE',{
   })).status,200);
   assert.equal(env.objects.size,0);

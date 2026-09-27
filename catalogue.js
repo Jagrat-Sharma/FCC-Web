@@ -75,6 +75,45 @@ import { labels } from './product-fields.js';
     content.append(element('p', item.description || 'Contact our team for product details.', 'fcc-cms-description'));
     const link = element('a', 'Enquire about this product', 'fcc-button');
     link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name);
+    if (item.colours?.length) {
+      const group = element('fieldset', undefined, 'fcc-colour-swatches');
+      group.append(element('legend', 'Choose a colour'));
+      const selected = element('p');
+      selected.setAttribute('aria-live', 'polite');
+      const image = layout.querySelector('img') || element('img', undefined, 'fcc-popup-image');
+      const choose = (colour, button) => {
+        group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
+        selected.textContent = colour.name + (colour.code ? ' · ' + colour.code : '') + (colour.image_url ? '' : ' — swatch image coming soon');
+        if (colour.image_url) {
+          image.src = colour.image_url;
+          image.alt = item.name + ' — ' + colour.name;
+          layout.prepend(image);
+          image.hidden = false;
+          layout.classList.remove('fcc-popup-no-image');
+        } else {
+          image.hidden = true;
+          layout.classList.add('fcc-popup-no-image');
+        }
+        link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name + ' — ' + colour.name + ' ' + colour.code);
+      };
+      for (const colour of item.colours) {
+        const button = element('button');
+        button.type = 'button';
+        button.setAttribute('aria-pressed', 'false');
+        if (colour.image_url) {
+          const thumb = element('img');
+          thumb.src = colour.image_url;
+          thumb.alt = '';
+          thumb.loading = 'lazy';
+          button.append(thumb);
+        }
+        button.append(element('span', colour.name), element('small', colour.code));
+        button.onclick = () => choose(colour, button);
+        group.append(button);
+      }
+      content.append(group, selected);
+      choose(item.colours[0], group.querySelector('button'));
+    }
     content.append(link);
     layout.append(content);
     popup.replaceChildren(close, layout);

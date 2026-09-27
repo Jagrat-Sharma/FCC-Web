@@ -79,6 +79,8 @@ function edit(item = null) {
     field('brand').value = item?.brand || '';
     if (!item && parameters.get('category')) field('category_id').value = parameters.get('category');
     renderSpecifications(item?.specifications || {});
+    $('colour-rows').replaceChildren();
+    (item?.colours || []).forEach(addColour);
   }
   if (view !== 'product') $('editor').showModal();
   field('name').focus();
@@ -199,6 +201,7 @@ form.onsubmit = async e => {
     })
   };
   if (kind === 'products') Object.assign(data, {
+    colours: [...document.querySelectorAll('.colour-row')].map(row => ({ name: row.querySelector('[data-colour-name]').value, code: row.querySelector('[data-colour-code]').value, image_id: row.dataset.imageId || null })),
     brand: field('brand').value, specifications: Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value])),
     name: field('name').value, category_id: field('category_id').value, price_cents: current?.price_cents ?? null, price_unit: current?.price_unit ?? '', featured: field('featured').checked
   });
@@ -295,3 +298,52 @@ field('category_id').addEventListener('change', () => {
   const values = Object.fromEntries([...document.querySelectorAll('[data-spec]')].map(input => [input.dataset.spec, input.value]));
   renderSpecifications(values);
 });
+
+function addColour(colour = {}) {
+  const row = node('div', undefined, 'colour-row');
+  row.dataset.imageId = colour.image_id || '';
+  for (const [key, title] of [['name', 'Colour name'], ['code', 'Colour code']]) {
+    const label = node('label', title);
+    const input = node('input');
+    input.dataset[key === 'name' ? 'colourName' : 'colourCode'] = '';
+    input.value = colour[key] || '';
+    input.maxLength = key === 'name' ? 100 : 60;
+    input.required = key === 'name';
+    label.append(input);
+    row.append(label);
+  }
+  const image = node('img');
+  image.alt = 'Colour swatch preview';
+  const previewColour = () => {
+    image.hidden = !row.dataset.imageId;
+    if (row.dataset.imageId) image.src = '/api/admin/media/' + row.dataset.imageId + '/file';
+  };
+  previewColour();
+  const label = node('label', 'Swatch image');
+  const upload = node('input');
+  upload.type = 'file';
+  upload.accept = 'image/jpeg,image/png,image/webp';
+  upload.onchange = async () => {
+    const file = upload.files[0];
+    if (!file) return;
+    lock(true);
+    try {
+      if (file.size > 5 * 1024 * 1024) throw new Error('Choose an image under 5 MB.');
+      const result = await api('media', { method: 'POST', headers: { 'Content-Type': file.type, 'X-File-Name': 'colour-swatch' }, body: file });
+      row.dataset.imageId = result.item.id;
+      previewColour();
+      $('form-status').textContent = 'Swatch uploaded. Save the product to apply.';
+    } catch (error) { $('form-status').textContent = error.message; }
+    finally { lock(false); upload.value = ''; }
+  };
+  label.append(upload);
+  const removeImage = node('button', 'Remove swatch image');
+  removeImage.type = 'button';
+  removeImage.onclick = () => { row.dataset.imageId = ''; previewColour(); };
+  const remove = node('button', 'Remove colour');
+  remove.type = 'button';
+  remove.onclick = () => row.remove();
+  row.append(image, label, removeImage, remove);
+  $('colour-rows').append(row);
+}
+$('add-colour').onclick = () => addColour();

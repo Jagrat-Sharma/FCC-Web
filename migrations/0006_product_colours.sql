@@ -1,0 +1,5 @@
+ALTER TABLE products ADD COLUMN colours TEXT NOT NULL DEFAULT '[]' CHECK(json_valid(colours) AND json_type(colours) = 'array');
+CREATE TRIGGER protect_colour_media BEFORE DELETE ON media
+WHEN EXISTS (SELECT 1 FROM products, json_each(products.colours) colour WHERE json_extract(colour.value, '$.image_id') = OLD.id)
+BEGIN SELECT RAISE(ABORT, 'FOREIGN KEY colour image is referenced'); END;
+UPDATE products SET colours = '[{"name": "Shasta White", "code": "14312", "image_id": null}, {"name": "Graffiti Beige", "code": "16855", "image_id": null}, {"name": "Oat Bread", "code": "16986", "image_id": null}, {"name": "Gaspé Grey", "code": "84199", "image_id": null}, {"name": "Merlin Grey", "code": "86583", "image_id": null}, {"name": "Metallic Grey", "code": "89056", "image_id": null}, {"name": "Silvered Sky", "code": "89823", "image_id": null}, {"name": "Manila Sand", "code": "19204", "image_id": null}, {"name": "Moonbeam", "code": "84294", "image_id": null}]' WHERE id = '14c12ec4-a886-4501-8df9-ed3e2be9d964' AND colours = '[]';

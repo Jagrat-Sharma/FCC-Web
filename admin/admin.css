@@ -373,3 +373,6 @@ body[data-view] .dashboard-sections { display: none; }
 }
 
 @media (min-width: 1000px) { .dashboard-sections { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+.colour-row { border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
+.colour-row img { width: 100px; height: 80px; object-fit: cover; }

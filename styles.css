@@ -2301,3 +2301,10 @@ html.fcc-popup-open {
 .fcc-icon-arrow-right { --fcc-icon-url: url("assets/icons/arrow-right.svg"); }
 .fcc-header .fcc-nav-cta .fcc-icon { width: 18px; height: 18px; }
 .fcc-products-menu > summary .fcc-icon { width: 14px; height: 14px; }
+
+.fcc-colour-swatches { border: 0; padding: 0; margin: 24px 0 12px; display: flex; flex-wrap: wrap; gap: 10px; }
+.fcc-colour-swatches legend { margin-bottom: 12px; font-weight: 600; }
+.fcc-colour-swatches button { width: 100px; padding: 6px; border: 2px solid var(--line); border-radius: 8px; background: var(--cream); color: var(--ink); cursor: pointer; }
+.fcc-colour-swatches button[aria-pressed="true"] { border-color: var(--green); }
+.fcc-colour-swatches button img { width: 84px; height: 64px; object-fit: cover; }
+.fcc-colour-swatches span, .fcc-colour-swatches small { display: block; }

@@ -26,7 +26,7 @@ function pageOptions(url) {
 }
 function itemView(row) {
   return {
-    ...row, ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
+    ...row, ...(row.colours !== undefined ? { colours: JSON.parse(row.colours).map(c => ({ ...c, image_url: c.image_id ? '/media/' + c.image_id : null })) } : {}), ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
       featured: !!row.featured
     }
     : {
@@ -78,6 +78,11 @@ async function saveItem(request, env, kind, id) {
   const data = record(input, kind);
   if (kind === 'products' && !await env.DB.prepare('SELECT id FROM categories WHERE id = ?').bind(data.category_id).first()) throw new HttpError(400, 'Choose an existing category.');
   if (data.image_id && !await env.DB.prepare('SELECT id FROM media WHERE id = ?').bind(data.image_id).first()) throw new HttpError(400, 'This image no longer exists. Upload it again.');
+  if (kind === 'products') {
+    for (const colour of JSON.parse(data.colours)) {
+      if (colour.image_id && !await env.DB.prepare('SELECT id FROM media WHERE id = ?').bind(colour.image_id).first()) throw new HttpError(400, 'A colour image no longer exists. Upload it again.');
+    }
+  }
   const fields = Object.keys(data);
   if (id) {
     idCheck(id);
@@ -126,7 +131,7 @@ export async function mediaResponse(request, env, id, admin = false) {
   const row = await env.DB.prepare('SELECT * FROM media WHERE id = ?').bind(id).first();
   if (!row) throw new HttpError(404, 'Image not found.');
   if (!admin) {
-    const visible = await env.DB.prepare('SELECT id FROM products WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM gallery WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM blogs WHERE image_id = ? AND published = 1 LIMIT 1').bind(id, id, id).first();
+    const visible = await env.DB.prepare('SELECT id FROM products WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM gallery WHERE image_id = ? AND published = 1 UNION ALL SELECT id FROM blogs WHERE image_id = ? AND published = 1 UNION ALL SELECT products.id FROM products, json_each(products.colours) colour WHERE json_extract(colour.value, \'$.image_id\') = ? AND products.published = 1 LIMIT 1').bind(id, id, id, id).first();
     if (!visible) throw new HttpError(404, 'Image not found.');
   }
   const object = await env.IMAGES.get(row.object_key);
@@ -175,7 +180,7 @@ export async function handleAPI({
           page, limit, offset
         }
         = pageOptions(url);
-        const rows = await env.DB.prepare('SELECT m.*, (SELECT COUNT(*) FROM products WHERE image_id=m.id) + (SELECT COUNT(*) FROM gallery WHERE image_id=m.id) + (SELECT COUNT(*) FROM blogs WHERE image_id=m.id) AS references_count FROM media m ORDER BY created_at DESC, id LIMIT ? OFFSET ?').bind(limit, offset).all();
+        const rows = await env.DB.prepare('SELECT m.*, (SELECT COUNT(*) FROM products WHERE image_id=m.id) + (SELECT COUNT(*) FROM gallery WHERE image_id=m.id) + (SELECT COUNT(*) FROM blogs WHERE image_id=m.id) + (SELECT COUNT(*) FROM products, json_each(products.colours) colour WHERE json_extract(colour.value, \'$.image_id\')=m.id) AS references_count FROM media m ORDER BY created_at DESC, id LIMIT ? OFFSET ?').bind(limit, offset).all();
         const count = await env.DB.prepare('SELECT COUNT(*) AS total FROM media').first();
         return json({
           items: rows.results.map(row => ({
