@@ -68,7 +68,6 @@ function edit(item = null) {
   field('name').value = item?.name || item?.title || '';
   field('description').value = item?.description || '';
   field('image_alt').value = item?.image_alt || '';
-  field('published').checked = item?.published || false;
   if (kind === 'products') {
     if (item) field('category_id').value = item.category_id;
     field('featured').checked = item?.featured || false;
@@ -109,7 +108,41 @@ async function list() {
         img.loading = 'lazy';
         card.append(img);
       }
-      card.append(node('h3', item.name || item.title || item.filename), node('p', kind === 'media' ? `${item.references_count} references · ${Math.ceil(item.size_bytes / 1024)} KB` : `${item.published ? 'Visible on website' : 'Hidden from website'}${item.featured ? ' · Featured' : ''}`));
+      const status = node('p', kind === 'media' ? `${item.references_count} references · ${Math.ceil(item.size_bytes / 1024)} KB` : `${item.published ? 'Visible on website' : 'Hidden from website'}${item.featured ? ' · Featured' : ''}`);
+      card.append(node('h3', item.name || item.title || item.filename), status);
+      if (requestedKind !== 'media') {
+        const visibility = node('label', undefined, 'visibility-toggle');
+        const caption = node('span');
+        caption.append(node('strong', 'Display on website'), node('small', 'Changes save immediately.'));
+        const toggle = node('input');
+        toggle.type = 'checkbox';
+        toggle.setAttribute('role', 'switch');
+        toggle.setAttribute('aria-label', 'Display on website: ' + (item.name || item.title));
+        toggle.checked = item.published;
+        const feedback = node('p', '', 'hint');
+        feedback.setAttribute('role', 'status');
+        toggle.onchange = async () => {
+          const published = toggle.checked;
+          const controls = [...card.querySelectorAll('button, input')];
+          controls.forEach(control => control.disabled = true);
+          feedback.textContent = 'Saving visibility…';
+          try {
+            // The version prevents this card from overwriting edits in another tab.
+            const result = await write(requestedKind + '/' + item.id, 'PUT', { ...item, published });
+            Object.assign(item, result.item);
+            toggle.checked = item.published;
+            status.textContent = `${item.published ? 'Visible on website' : 'Hidden from website'}${item.featured ? ' · Featured' : ''}`;
+            feedback.textContent = item.published ? 'Now displayed on the website.' : 'Now hidden from the website.';
+          } catch (error) {
+            toggle.checked = item.published;
+            feedback.textContent = error.message + ' Use Refresh to check the latest visibility before trying again.';
+          } finally {
+            controls.forEach(control => control.disabled = false);
+          }
+        };
+        visibility.append(caption, toggle);
+        card.append(visibility, feedback);
+      }
       const actions = node('div', undefined, 'actions');
       if (kind !== 'media') {
         const button = node('button', 'Edit');
@@ -194,7 +227,7 @@ form.onsubmit = async e => {
     return;
   }
   const data = {
-    description: field('description').value, image_id: imageId, image_alt: field('image_alt').value, published: field('published').checked, ...(current ? {
+    description: field('description').value, image_id: imageId, image_alt: field('image_alt').value, published: current?.published ?? false, ...(current ? {
       version: current.version
     }
     : {

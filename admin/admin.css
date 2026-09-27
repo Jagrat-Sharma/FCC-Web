@@ -287,6 +287,15 @@ dialog::backdrop {
   color:#64748b;
   margin-top:4px
 }
+.card .visibility-toggle {
+  padding:12px;
+  margin-top:12px;
+  gap:12px;
+}
+.visibility-toggle input:focus-visible {
+  outline:3px solid #527aaa;
+  outline-offset:3px;
+}
 .visibility-toggle input {
   appearance:none;
   flex:0 0 46px;
