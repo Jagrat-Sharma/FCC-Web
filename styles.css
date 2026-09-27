@@ -2308,3 +2308,15 @@ html.fcc-popup-open {
 .fcc-colour-swatches button[aria-pressed="true"] { border-color: var(--green); }
 .fcc-colour-swatches button img { width: 84px; height: 64px; object-fit: cover; }
 .fcc-colour-swatches span, .fcc-colour-swatches small { display: block; }
+
+/* Keep colour choices with the product photograph. */
+.fcc-popup-media { min-width: 0; padding: 24px; align-self: start; }
+.fcc .fcc-popup-media > .fcc-popup-image { height: auto; min-height: 0; max-height: 360px; aspect-ratio: 1; border-radius: 10px; }
+.fcc-popup-media .fcc-colour-swatches { margin-top: 16px; gap: 8px; }
+.fcc-popup-media .fcc-colour-swatches button { width: 70px; font-size: 11px; }
+.fcc-popup-media .fcc-colour-swatches button img { width: 54px; height: 48px; }
+.fcc-swatch-status { font-size: 13px; color: var(--muted); }
+@media (max-width: 680px) {
+  .fcc-popup-media { padding: 48px 20px 0; }
+  .fcc .fcc-popup-media > .fcc-popup-image { max-height: 260px; }
+}

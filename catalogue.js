@@ -44,12 +44,15 @@ import { labels } from './product-fields.js';
     close.autofocus = true;
     close.onclick = () => popup.close();
     const layout = element('div', undefined, 'fcc-popup-layout');
+    const media = element('div', undefined, 'fcc-popup-media');
+    const hasColours = !!item.colours?.length;
+    if (item.image_url || hasColours) layout.append(media);
     if (item.image_url) {
       const image = element('img', undefined, 'fcc-popup-image');
       image.src = item.image_url;
       image.alt = item.image_alt || item.name;
-      layout.append(image);
-    } else layout.classList.add('fcc-popup-no-image');
+      media.append(image);
+    } else if (!hasColours) layout.classList.add('fcc-popup-no-image');
     const content = element('div', undefined, 'fcc-popup-content');
     const title = element('h2', item.name);
     title.id = 'fcc-popup-title';
@@ -59,40 +62,44 @@ import { labels } from './product-fields.js';
       style: 'currency', currency: 'CAD'
     }).format(item.price_cents / 100) + ' CAD ' + item.price_unit, 'fcc-cms-price'));
     const specifications = { ...(item.brand ? { brand: item.brand } : {}), ...item.specifications };
+    const selectedColour = element('td');
+    selectedColour.setAttribute('aria-live', 'polite');
+    if (hasColours) specifications.color = '';
     if (Object.keys(specifications).length) {
       const table = element('table', undefined, 'fcc-specifications');
       const caption = element('caption', 'Product specifications');
       table.append(caption);
       for (const [key, value] of Object.entries(specifications)) {
         const row = element('tr');
-        const heading = element('th', key === 'brand' ? 'Brand / company' : labels[key] || key);
+        const heading = element('th', key === 'brand' ? 'Brand / company' : key === 'color' && hasColours ? 'Colour' : labels[key] || key);
         heading.scope = 'row';
-        row.append(heading, element('td', value));
+        row.append(heading, key === 'color' && hasColours ? selectedColour : element('td', value));
         table.append(row);
       }
       content.append(table);
     }
-    content.append(element('p', item.description || 'Contact our team for product details.', 'fcc-cms-description'));
+    content.append(element('p', (hasColours ? (item.description || '').replace(/Available colours:\s*\n[\s\S]*?(?:\n\n|$)/i, '') : item.description) || 'Contact our team for product details.', 'fcc-cms-description'));
     const link = element('a', 'Enquire about this product', 'fcc-button');
     link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name);
     if (item.colours?.length) {
       const group = element('fieldset', undefined, 'fcc-colour-swatches');
       group.append(element('legend', 'Choose a colour'));
-      const selected = element('p');
+      const selected = element('p', undefined, 'fcc-swatch-status');
       selected.setAttribute('aria-live', 'polite');
       const image = layout.querySelector('img') || element('img', undefined, 'fcc-popup-image');
       const choose = (colour, button) => {
         group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
-        selected.textContent = colour.name + (colour.code ? ' · ' + colour.code : '') + (colour.image_url ? '' : ' — swatch image coming soon');
+        selectedColour.textContent = colour.name + (colour.code ? ' · ' + colour.code : '');
+        selected.textContent = colour.image_url ? '' : 'Swatch image coming soon';
         if (colour.image_url) {
           image.src = colour.image_url;
           image.alt = item.name + ' — ' + colour.name;
-          layout.prepend(image);
+          media.prepend(image);
           image.hidden = false;
           layout.classList.remove('fcc-popup-no-image');
         } else {
           image.hidden = true;
-          layout.classList.add('fcc-popup-no-image');
+          layout.classList.remove('fcc-popup-no-image');
         }
         link.href = 'mailto:firstchoicecarpets@hotmail.com?subject=' + encodeURIComponent('Product enquiry: ' + item.name + ' — ' + colour.name + ' ' + colour.code);
       };
@@ -111,7 +118,7 @@ import { labels } from './product-fields.js';
         button.onclick = () => choose(colour, button);
         group.append(button);
       }
-      content.append(group, selected);
+      media.append(group, selected);
       choose(item.colours[0], group.querySelector('button'));
     }
     content.append(link);
