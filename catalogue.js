@@ -280,6 +280,7 @@ import { labels } from './product-fields.js';
         const input = element('input');
         input.type = 'checkbox';
         input.value = brand.name;
+        input.checked = new URLSearchParams(location.search).getAll('brand').includes(brand.name);
         input.addEventListener('change', () => { page = 1; load(); });
         label.append(input, element('span', brand.name));
         box.append(label);
@@ -293,6 +294,5 @@ import { labels } from './product-fields.js';
       box.append(retry);
     }
   }
-  loadBrands();
-  load();
+  loadBrands().then(load);
 })();

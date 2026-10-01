@@ -2178,6 +2178,9 @@ html.fcc-popup-open {
 }
 
 /* Brand filters and specification tables use the same product data as the admin. */
+.fcc-menu-brands { display: grid; gap: 8px; max-height: 240px; overflow-y: auto; }
+.fcc-menu-brands a { display: block; padding: 6px 0; }
+.fcc-submenu-fields:has(.fcc-menu-brands) { grid-template-columns: 1fr; gap: 12px; }
 .fcc-brand-filter { padding: 24px 0; border-top: 1px solid var(--line); }
 #fcc-brand-options {
   max-height: 280px;

@@ -100,7 +100,7 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
       // Mouse clicks browse the category. Touch first reveals its options;
       // a second tap browses it. Keyboard users can follow the panel link.
       if (event.detail > 0 && (pointerType === 'mouse' || wasOpenOnPress)) {
-        category.querySelector('.fcc-submenu a').click();
+        category.querySelector('.fcc-submenu > a').click();
       }
       pointerType = '';
       wasOpenOnPress = false;
@@ -172,3 +172,41 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
     if (reducedMotion.matches && animation) animation.finish();
   });
 });
+
+// One catalogue request supplies the shared dropdown on every public page.
+(async () => {
+  const panels = [...document.querySelectorAll('.fcc-category-menu .fcc-submenu')];
+  if (!panels.length) return;
+  const show = (panel, items, failed = false) => {
+    const fields = panel.querySelector('.fcc-submenu-fields');
+    const categoryLink = panel.querySelector(':scope > a');
+    if (!fields || !categoryLink) return;
+    const slug = new URL(categoryLink.href).searchParams.get('category');
+    const heading = document.createElement('h3');
+    heading.textContent = 'Brands';
+    const list = document.createElement('div');
+    list.className = 'fcc-menu-brands';
+    for (const item of items.filter(item => item.category === slug)) {
+      const link = document.createElement('a');
+      const url = new URL(categoryLink.href);
+      url.searchParams.set('brand', item.brand);
+      link.href = url.pathname + url.search;
+      link.textContent = item.brand;
+      list.append(link);
+    }
+    if (!list.children.length) {
+      const note = document.createElement('p');
+      note.textContent = failed ? 'Brands could not be loaded. Browse the category below.' : 'Ask us about available brands in this category.';
+      list.append(note);
+    }
+    fields.replaceChildren(heading, list);
+  };
+  try {
+    const response = await fetch('/api/navigation');
+    if (!response.ok) throw new Error('Catalogue unavailable');
+    const data = await response.json();
+    panels.forEach(panel => show(panel, data.items));
+  } catch {
+    panels.forEach(panel => show(panel, [], true));
+  }
+})();

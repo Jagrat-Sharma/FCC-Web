@@ -164,6 +164,10 @@ export async function handleAPI({
     } else if (request.method !== 'GET') throw new HttpError(405, 'Public APIs are read-only.');
     if (!env.DB || !env.IMAGES) throw new HttpError(503, 'The catalogue is not configured yet.');
     const [kind, id, action] = parts;
+    if (!admin && kind === 'navigation' && parts.length === 1) {
+      const rows = await env.DB.prepare("SELECT DISTINCT c.slug AS category, p.brand FROM products p JOIN categories c ON c.id = p.category_id WHERE p.published = 1 AND p.brand <> '' ORDER BY p.brand COLLATE NOCASE").all();
+      return json({ items: rows.results });
+    }
     if (parts.length > 3) throw new HttpError(404, 'Route not found.');
     if (admin && kind === 'session' && !id && request.method === 'GET') return json(user);
     if (kind === 'brands' && !id && request.method === 'GET') {
