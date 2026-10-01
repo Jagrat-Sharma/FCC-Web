@@ -1,5 +1,6 @@
 import { labels } from '../product-fields.js';
 import { isManufacturerImage } from './manufacturer-images.js';
+import { isLocalProductImage } from './local-product-images.js';
 import {
   HttpError
 }
@@ -46,7 +47,7 @@ export function record(input, kind) {
       const image_id = colour.image_id || null;
       if (image_id && !UUID.test(image_id)) throw new HttpError(400, 'Invalid colour image.');
       const source_image_url = colour.source_image_url || '';
-      if (source_image_url && !isManufacturerImage(source_image_url)) throw new HttpError(400, 'Invalid manufacturer swatch URL.');
+      if (source_image_url && !isManufacturerImage(source_image_url) && !isLocalProductImage(source_image_url)) throw new HttpError(400, 'Invalid manufacturer swatch URL.');
       return { source_image_url, name: text(colour.name, 'Colour name', 100, true), code: text(colour.code, 'Colour code', 60), image_id };
     });
     if (new Set(cleanColours.map(c => (c.code || c.name).toLowerCase())).size !== cleanColours.length) throw new HttpError(400, 'Colour names or codes must be unique.');

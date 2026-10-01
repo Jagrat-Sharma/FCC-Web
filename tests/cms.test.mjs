@@ -11,6 +11,7 @@ from 'node:fs';
 import { categoryFields } from '../product-fields.js';
 import { downloadImage } from '../server/image-import.js';
 import { catalogueImage } from '../catalogue-image-map.js';
+import { isLocalProductImage } from '../server/local-product-images.js';
 import { isManufacturerImage, manufacturerImageOrigins } from '../server/manufacturer-images.js';
 import {
   handleAPI, mediaResponse
@@ -501,9 +502,18 @@ test('all migrations apply together without duplicating Strong Intuition', () =>
   assert.equal(sql.prepare('SELECT count(*) AS n FROM products WHERE published = 1').get().n, 0);
   assert.equal(sql.prepare('SELECT count(*) AS n FROM products, json_each(products.colours)').get().n, 352);
   const imageCount = () => sql.prepare("SELECT count(*) AS n FROM products, json_each(products.colours) WHERE coalesce(json_extract(value, '$.source_image_url'), '') <> ''").get().n;
-  assert.equal(imageCount(), 314); // 305 batch swatches plus nine existing Beaulieu swatches.
+  assert.equal(imageCount(), 331); // Includes the 17 formerly missing product images.
+  const newImages = JSON.parse(readFileSync(new URL('../catalogue-imports/missing-image-sources.json', import.meta.url), 'utf8'));
+  assert.equal(newImages.length, 17);
+  for (const image of newImages) {
+    assert.ok(isLocalProductImage(image.local));
+    assert.equal(readFileSync(new URL('../dist' + image.local, import.meta.url)).toString('ascii', 8, 12), 'WEBP');
+    assert.equal(sql.prepare("SELECT count(*) AS n FROM products, json_each(products.colours) WHERE json_extract(value, '$.source_image_url') = ? AND json_extract(value, '$.name') = ?").get(image.local, image.name).n, 1);
+  }
+  assert.ok(!isLocalProductImage('/assets/catalogue/unreviewed.webp'));
   const before = sql.prepare('SELECT id, colours, version FROM products ORDER BY id').all();
   sql.exec(readFileSync(new URL('0009_catalogue_images.sql', migrations), 'utf8'));
+  sql.exec(readFileSync(new URL('0010_missing_product_images.sql', migrations), 'utf8'));
   assert.deepEqual(sql.prepare('SELECT id, colours, version FROM products ORDER BY id').all(), before);
   sql.close();
 });

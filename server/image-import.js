@@ -8,7 +8,8 @@ const hosts = new Set([
   'www.msisurfaces.com', 'www.vifloor.com', 'www.goodfellowinc.com',
   'www.richmondflooring.ca', 'leeflooring.ca', 'www.pentzcommercial.com',
   'www.godfreyhirst.com', 'forbo.azureedge.net', 'scrl.img.trykcloudstatic.com',
-  'res.cloudinary.com', 'www.shnierflooring.ca', 'cdn.msisurfaces.com', 'cdn.bfldr.com'
+  'res.cloudinary.com', 'www.shnierflooring.ca', 'cdn.msisurfaces.com', 'cdn.bfldr.com',
+  'pcrl.img.trykcloudstatic.com'
 ]);
 
 function checkedURL(value) {
