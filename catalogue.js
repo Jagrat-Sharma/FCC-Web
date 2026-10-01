@@ -281,7 +281,7 @@ import { labels } from './product-fields.js';
         input.type = 'checkbox';
         input.value = brand.name;
         input.addEventListener('change', () => { page = 1; load(); });
-        label.append(input, document.createTextNode(brand.name));
+        label.append(input, element('span', brand.name));
         box.append(label);
       }
       if (!data.items.length) box.textContent = 'Brands will appear as products are updated.';
