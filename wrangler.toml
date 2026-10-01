@@ -7,7 +7,7 @@ pages_build_output_dir = "./dist"
 PUBLIC_ORIGIN = "https://jagratsharma.com"
 ACCESS_TEAM_DOMAIN = "https://icy-king-9dd1.cloudflareaccess.com"
 ACCESS_AUD = "2e0b5aa6f8137d3951230aab169a23c534986e9b7aaa24ff7fb8d07a2e60c2a1"
-ADMIN_EMAILS = "sharmajagrat25@gmail.com"
+ADMIN_EMAILS = "sharmajagrat25@gmail.com,firstchoicecarpets@hotmail.com"
 
 [[d1_databases]]
 binding = "DB"
@@ -19,7 +19,7 @@ migrations_dir = "migrations"
 binding = "IMAGES"
 bucket_name = "fcc-images"
 
-# Configure preview deployments separately. Never bind them to production data.
+# Preview
 [env.preview.vars]
 PUBLIC_ORIGIN = "https://REPLACE-WITH-STAGING-DOMAIN.example"
 ACCESS_TEAM_DOMAIN = "https://REPLACE-WITH-YOUR-TEAM.cloudflareaccess.com"
