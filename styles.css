@@ -2017,6 +2017,15 @@ html.fcc-popup-open {
     transform:none
   }
 }
+.fcc-flooring-types {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px 32px;
+  margin: 24px 0 32px;
+  padding-left: 20px;
+  line-height: 1.6;
+}
+
 .fcc-service-grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));

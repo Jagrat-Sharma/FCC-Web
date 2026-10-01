@@ -1,5 +1,7 @@
 # Catalogue images and image links
 
+**Update:** Existing catalogue image references now resolve to files hosted with the website. See [Local catalogue images](LOCAL-CATALOGUE-IMAGES.md). The link-import feature below continues to store new admin imports in R2.
+
 ## Deploy this update
 
 1. Commit and push these changes using the existing GitHub deployment workflow; wait for the Pages deployment to succeed.

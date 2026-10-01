@@ -7,3 +7,9 @@
 /admin*
   Cache-Control: no-store
   X-Robots-Tag: noindex, nofollow
+
+/assets/catalogue/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/catalogue-image-map.js
+  Cache-Control: no-cache

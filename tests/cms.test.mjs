@@ -10,6 +10,7 @@ import {
 from 'node:fs';
 import { categoryFields } from '../product-fields.js';
 import { downloadImage } from '../server/image-import.js';
+import { catalogueImage } from '../catalogue-image-map.js';
 import { isManufacturerImage, manufacturerImageOrigins } from '../server/manufacturer-images.js';
 import {
   handleAPI, mediaResponse
@@ -409,7 +410,7 @@ test('reviewed catalogue migration preserves existing work and all colour choice
   assert.equal(publicProducts.total, 1);
   assert.equal(publicProducts.items[0].name, edited.name);
   assert.equal(publicProducts.items[0].colours.length, 35);
-  assert.ok(publicProducts.items[0].image_url.startsWith('https://shawfloors.widen.net/'));
+  assert.ok(publicProducts.items[0].image_url.startsWith('/assets/catalogue/'));
 
   const malicious = ['https://example.com/swatch.jpg', 'javascript:alert(1)', 'https://shawfloors.widen.net/other.jpg', shaw.colours[0].source_image_url + '&redirect=https://example.com'];
   for (const source_image_url of malicious) {
@@ -464,6 +465,27 @@ test('image link imports enforce authorization, safe destinations, file limits a
     globalThis.fetch = originalFetch;
     env.sql.close();
   }
+});
+
+test('catalogue image mappings point to deployed WebP assets and larger Interface images', () => {
+  const report = JSON.parse(readFileSync(new URL('../catalogue-imports/local-image-report.json', import.meta.url), 'utf8'));
+  assert.equal(report.length, 314);
+  const interfaceImages = report.filter(item => item.original.includes('/interfaceprd/'));
+  assert.equal(interfaceImages.length, 24);
+  for (const item of report) {
+    assert.ok(!item.error, item.original);
+    assert.equal(catalogueImage(item.original), item.local);
+    assert.match(item.local, /^\/assets\/catalogue\/[a-f0-9]{24}\.webp$/);
+    const bytes = readFileSync(new URL('../dist' + item.local, import.meta.url));
+    assert.equal(bytes.toString('ascii', 8, 12), 'WEBP');
+    assert.equal(bytes.length, item.local_bytes);
+    assert.ok(item.width <= item.source_width && item.height <= item.source_height);
+  }
+  for (const item of interfaceImages) {
+    assert.equal(item.width, 1200);
+    assert.equal(item.height, 1200);
+  }
+  assert.equal(catalogueImage(null), null);
 });
 
 test('all migrations apply together without duplicating Strong Intuition', () => {

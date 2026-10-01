@@ -33,6 +33,8 @@ Brand filters use the imported brand names. A draft brand does not appear public
 
 ## Image status
 
+**Local hosting update:** All 314 existing references (including nine Beaulieu images) now have local website assets. Interface images have been replaced with 1200 × 1200 versions. See [local image coverage and deployment](LOCAL-CATALOGUE-IMAGES.md). The original import history below describes how the source references were added.
+
 **305 manufacturer image references** are now attached after migration `0009_catalogue_images.sql`: the original 36 plus 269 additional matching swatches. These are external URLs, not downloaded R2 files. Some are small manufacturer thumbnails; replace them with higher-resolution swatches when available. Deployed image loading has not been visually verified. See [image setup and admin instructions](IMAGE-IMPORT.md).
 
 **38 colour choices still have no image:** Dye Lab (12), Traced (10), Hydrasafe (9), Rare Vintage (6), and Coastal Driftwood (1). They remain selectable by name; the product popup shows “Swatch image coming soon” instead of displaying another colour's photograph. No substitute or guessed swatch images were added. Existing Strong Intuition's nine external URLs remain unchanged.

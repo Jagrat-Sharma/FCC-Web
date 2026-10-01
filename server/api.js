@@ -11,6 +11,7 @@ import {
 }
 from './validation.js';
 import { downloadImage } from './image-import.js';
+import { catalogueImage } from '../catalogue-image-map.js';
 const kinds = new Set(['products', 'gallery', 'blogs']);
 const nowSQL = "strftime('%Y-%m-%dT%H:%M:%fZ','now')";
 function idCheck(id) {
@@ -27,12 +28,12 @@ function pageOptions(url) {
 }
 function itemView(row) {
   return {
-    ...row, ...(row.colours !== undefined ? { colours: JSON.parse(row.colours).map(c => ({ ...c, image_url: c.image_id ? '/media/' + c.image_id : c.source_image_url || null })) } : {}), ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
+    ...row, ...(row.colours !== undefined ? { colours: JSON.parse(row.colours).map(c => ({ ...c, image_url: c.image_id ? '/media/' + c.image_id : catalogueImage(c.source_image_url) })) } : {}), ...(row.specifications !== undefined ? { specifications: JSON.parse(row.specifications) } : {}), published: !!row.published, ...(row.featured !== undefined ? {
       featured: !!row.featured
     }
     : {
     }),
-    image_url: row.image_id ? `/media/${row.image_id}` : (row.colours ? JSON.parse(row.colours).map(c => c.image_id ? '/media/' + c.image_id : c.source_image_url).find(Boolean) || null : null)
+    image_url: row.image_id ? `/media/${row.image_id}` : (row.colours ? JSON.parse(row.colours).map(c => c.image_id ? '/media/' + c.image_id : catalogueImage(c.source_image_url)).find(Boolean) || null : null)
   };
 }
 async function listItems(env, url, kind, admin) {

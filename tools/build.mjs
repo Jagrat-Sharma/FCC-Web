@@ -17,7 +17,7 @@ from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const output = resolve(root, 'dist');
 const files = ['blog.html','blog.js','index.html','about.html','services.html','contact.html','faq.html','gallery.html','products.html',
-'styles.css','script.js','navigation.js','catalogue.js','gallery.js','showcase.js','home-products.js','product-fields.js','favicon.png','favicon.svg','404.html','_headers','_routes.json','robots.txt'];
+'styles.css','script.js','navigation.js','catalogue.js','catalogue-image-map.js','gallery.js','showcase.js','home-products.js','product-fields.js','favicon.png','favicon.svg','404.html','_headers','_routes.json','robots.txt'];
 // Allowlist only: no .git, secrets, migrations, WordPress, tests or server source.
 // The resolved deletion target is exactly this project's generated dist directory.
 if (output !== resolve(root, 'dist') || dirname(output) !== root) throw new Error('Unsafe build output.');

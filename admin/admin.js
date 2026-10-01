@@ -1,4 +1,5 @@
 import { labels, categoryFields } from '/product-fields.js';
+import { catalogueImage } from '/catalogue-image-map.js';
 const $ = id => document.getElementById(id);
 const form = $('edit-form'), field = name => form.elements.namedItem(name);
 const view = document.body.dataset.view;
@@ -103,7 +104,7 @@ async function list() {
       const card = node('article', undefined, 'card');
       const colourImage = item.colours?.find(colour => colour.image_id || colour.source_image_url);
       const previewId = item.image_id || (kind === 'media' ? item.id : colourImage?.image_id);
-      const previewURL = previewId ? '/api/admin/media/' + previewId + '/file' : colourImage?.source_image_url;
+      const previewURL = previewId ? '/api/admin/media/' + previewId + '/file' : catalogueImage(colourImage?.source_image_url);
       if (previewURL) {
         const img = node('img');
         img.src = previewURL;
@@ -370,7 +371,7 @@ function addColour(colour = {}) {
   image.alt = 'Colour swatch preview';
   const previewColour = () => {
     image.hidden = !row.dataset.imageId && !row.dataset.sourceImageUrl;
-    image.src = row.dataset.imageId ? '/api/admin/media/' + row.dataset.imageId + '/file' : row.dataset.sourceImageUrl;
+    image.src = row.dataset.imageId ? '/api/admin/media/' + row.dataset.imageId + '/file' : catalogueImage(row.dataset.sourceImageUrl) || '';
   };
   previewColour();
   const label = node('label', 'Swatch image');
