@@ -191,7 +191,22 @@ document.querySelectorAll('.fcc-products-menu').forEach(menu => {
       const url = new URL(categoryLink.href);
       url.searchParams.set('brand', item.brand);
       link.href = url.pathname + url.search;
-      link.textContent = item.brand;
+      if (item.logo?.src) {
+        const visual = document.createElement('span');
+        visual.className = 'fcc-menu-brand-image' + (item.logo.dark ? ' fcc-menu-brand-image-dark' : '');
+        const image = document.createElement('img');
+        image.src = item.logo.src;
+        image.alt = '';
+        image.loading = 'lazy';
+        image.decoding = 'async';
+        image.addEventListener('error', () => visual.remove(), { once: true });
+        visual.append(image);
+        link.append(visual);
+      }
+      const name = document.createElement('span');
+      name.className = 'fcc-menu-brand-name';
+      name.textContent = item.brand;
+      link.append(name);
       list.append(link);
     }
     if (!list.children.length) {

@@ -1,0 +1,98 @@
+{
+  "Torlys Flooring": {
+    "src": "/assets/brands/torlys-flooring.svg",
+    "source": "https://torlys.com/wp-content/uploads/2025/05/torlys-logo-1.svg",
+    "dark": false
+  },
+  "Patcraft": {
+    "src": "/assets/brands/patcraft.svg",
+    "source": "https://www.patcraft.com/getmedia/5d9740eb-776f-4d31-b75d-f2c8d6b8febb/patcraft-logo-k.svg.aspx",
+    "dark": false
+  },
+  "Pentz Commercial": {
+    "src": "/assets/brands/pentz-commercial.svg",
+    "source": "https://www.pentzcommercial.com/wp-content/themes/pentz/assets/release/images/logo-header.svg",
+    "dark": false
+  },
+  "Anderson Tuftex": {
+    "src": "/assets/brands/anderson-tuftex.webp",
+    "source": "https://shawfloors.widen.net/content/rtvapyelgh/webp/Anderson%2520Tuftex%2520Logo_Olivine.webp?h=48&position=c&color=ffffffff&quality=80&u=ojeofe&ext=.&w=0&fmt=webp&crop=false",
+    "dark": false
+  },
+  "Shaw Floors": {
+    "src": "/assets/brands/shaw-floors.webp",
+    "source": "https://shawfloors.widen.net/content/3sepoqbula/webp/ShawFloors_Primary_RGB.webp?w=0&position=c&color=ffffff00&quality=80&u=ow2cyi&h=48&fmt=webp&crop=false",
+    "dark": false
+  },
+  "Richmond Flooring (Shnier/Gesco)": {
+    "src": "/assets/brands/richmond-flooring-shnier-gesco-.svg",
+    "source": "https://www.richmondflooring.ca/img/header_logo_light.svg?815DA",
+    "dark": false
+  },
+  "MSI Surfaces": {
+    "src": "/assets/brands/msi-surfaces.svg",
+    "source": "https://www.msisurfaces.com/new-branding/images/msi_logo_with_tagline.svg",
+    "dark": false
+  },
+  "Philadelphia Commercial": {
+    "src": "/assets/brands/philadelphia-commercial.svg",
+    "source": "https://embed.widencdn.net/svg/shawfloors/xah7wmdr0e/pc-logo-color.svg?u=x2baoa&use=muhz9",
+    "dark": false
+  },
+  "Shaw Contract": {
+    "src": "/assets/brands/shaw-contract.svg",
+    "source": "https://www.shawcontract.com/Content/images/shawcontract-logo-black.svg",
+    "dark": false
+  },
+  "Beaulieu Canada": {
+    "src": "/assets/brands/beaulieu-canada.png",
+    "source": "https://canada.beaulieucanada.com/uploads/brand-of-beaulieu_logo_white_200x83.png",
+    "dark": true
+  },
+  "Aladdin Commercial": {
+    "src": "/assets/brands/aladdin-commercial.svg",
+    "source": "https://www.aladdincommercial.com/assets/icons/svg/aladdin-logo.svg",
+    "dark": false
+  },
+  "Biyork Floors": {
+    "src": "/assets/brands/biyork-floors.jpg",
+    "source": "https://www.biyorkcanada.com/cdn/shop/files/biyork_logo.jpg?v=1712244315",
+    "dark": false
+  },
+  "Forbo": {
+    "src": "/assets/brands/forbo.svg",
+    "source": "https://www.forbo.com/content/images/forbo_flooring_logo.svg",
+    "dark": false
+  },
+  "Lee Flooring": {
+    "src": "/assets/brands/lee-flooring.webp",
+    "source": "https://leeflooring.ca/wp-content/uploads/2025/10/LogoTM.webp",
+    "dark": false
+  },
+  "ViFloor": {
+    "src": "/assets/brands/vifloor.png",
+    "source": "https://www.vifloor.com/wp-content/uploads/2025/06/VIFLOOR-CANADA-LTD-new-04-1-scaled-e1750251633307.png",
+    "dark": true
+  },
+  "Mohawk Industries": {
+    "src": "/assets/brands/mohawk-industries.png",
+    "source": "https://cdn.cookielaw.org/logos/315538a0-5e81-4e0b-aa2a-44c3c009ef4b/01900def-840a-77af-a112-a7f8bed8573a/4bd3a45b-3c66-4d6d-84ee-3adc512a4559/MohawkLogo.png",
+    "dark": false
+  },
+  "Interface": {
+    "src": "/assets/brands/interface.svg",
+    "source": "https://www.interface.com/US/en-US.html"
+  },
+  "Godfrey Hirst": {
+    "src": "/assets/brands/godfrey-hirst.svg",
+    "source": "https://www.godfreyhirst.com/au"
+  },
+  "Goodfellow": {
+    "src": "/assets/brands/goodfellow.png",
+    "source": "https://www.goodfellowinc.com/wp-content/themes/wpActivis/_/images/new-goodfellow-logo.png"
+  },
+  "Stanton Carpet": {
+    "src": "/assets/brands/stanton-carpet.jpg",
+    "source": "https://cdn.bfldr.com/PMOA7OGQ/as/m7nj63gtjqjjrwsgj9nhkbn/Stanton_Logo__Elevated_tagline?auto=webp&format=jpg&height=.6&width=.6&position=3"
+  }
+}

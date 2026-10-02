@@ -2178,8 +2178,37 @@ html.fcc-popup-open {
 }
 
 /* Brand filters and specification tables use the same product data as the admin. */
-.fcc-menu-brands { display: grid; gap: 8px; max-height: 240px; overflow-y: auto; }
-.fcc-menu-brands a { display: block; padding: 6px 0; }
+.fcc-menu-brands {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.fcc-menu-brands a {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  text-align: center;
+  text-decoration: none;
+}
+.fcc-menu-brands a:hover { background: var(--line); }
+.fcc-menu-brand-image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 80px;
+  background: #fff;
+  border-radius: 6px;
+  overflow: hidden;
+}
+.fcc-menu-brand-image img { width: 100%; height: 100%; object-fit: contain; padding: 10px; }
+.fcc-menu-brand-image-dark { background: #292929; }
+.fcc-menu-brands .fcc-menu-brand-name { font: 500 12px/1.4 Arial, sans-serif; overflow-wrap: anywhere; }
+.fcc-menu-brands > p { grid-column: 1 / -1; }
 .fcc-submenu-fields:has(.fcc-menu-brands) { grid-template-columns: 1fr; gap: 12px; }
 .fcc-brand-filter { padding: 24px 0; border-top: 1px solid var(--line); }
 #fcc-brand-options {

@@ -12,6 +12,7 @@ import {
 from './validation.js';
 import { downloadImage } from './image-import.js';
 import { catalogueImage } from '../catalogue-image-map.js';
+import { brandLogo } from './brand-logos.js';
 const kinds = new Set(['products', 'gallery', 'blogs']);
 const nowSQL = "strftime('%Y-%m-%dT%H:%M:%fZ','now')";
 function idCheck(id) {
@@ -166,7 +167,7 @@ export async function handleAPI({
     const [kind, id, action] = parts;
     if (!admin && kind === 'navigation' && parts.length === 1) {
       const rows = await env.DB.prepare("SELECT DISTINCT c.slug AS category, p.brand FROM products p JOIN categories c ON c.id = p.category_id WHERE p.published = 1 AND p.brand <> '' ORDER BY p.brand COLLATE NOCASE").all();
-      return json({ items: rows.results });
+      return json({ items: rows.results.map(item => ({ ...item, logo: brandLogo(item.brand) })) });
     }
     if (parts.length > 3) throw new HttpError(404, 'Route not found.');
     if (admin && kind === 'session' && !id && request.method === 'GET') return json(user);
