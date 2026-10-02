@@ -2,6 +2,15 @@ import { labels } from './product-fields.js';
 (() => {
   const $ = id => document.getElementById(id), grid = document.querySelector('.fcc-catalog-grid');
   if (!grid) return;
+  const filterPanel = $('fcc-filter-disclosure');
+  const mobileFilters = matchMedia('(max-width: 1000px)');
+  const syncFilters = () => { filterPanel.open = !mobileFilters.matches; };
+  syncFilters();
+  mobileFilters.addEventListener('change', syncFilters);
+  $('fcc-filter-done').addEventListener('click', () => {
+    filterPanel.open = false;
+    filterPanel.querySelector('summary').focus({ preventScroll: true });
+  });
   document.documentElement.classList.add('fcc-catalogue-page');
   const search = $('fcc-product-search'), sort = $('fcc-product-sort'), size = $('fcc-page-size');
   search.value = new URLSearchParams(location.search).get('q') || '';

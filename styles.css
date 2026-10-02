@@ -2258,6 +2258,24 @@ html.fcc-popup-open {
 .fcc-breadcrumb { font-size: 13px; margin-bottom: 24px; color: var(--muted); }
 .fcc-catalog-intro h1 { font-size: clamp(34px, 4vw, 48px); }
 .fcc-filters .fcc-filter-box { background: transparent; border: 0; border-bottom: 1px solid var(--line); padding: 0 0 24px; }
+.fcc-filter-disclosure > summary,
+.fcc-filter-done { display: none; }
+@media (max-width: 1000px) {
+  .fcc-catalog { grid-template-columns: minmax(0, 1fr); gap: 16px; padding-top: 20px; }
+  .fcc-filter-disclosure { border: 1px solid var(--line); border-radius: 10px; }
+  .fcc-filter-disclosure > summary {
+    display: list-item;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .fcc-filter-disclosure > summary span { margin-left: 8px; font-size: 12px; font-weight: 400; color: var(--muted); }
+  .fcc-filter-content { padding: 0 16px 16px; }
+  .fcc-filter-content .fcc-category-buttons { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fcc-filter-content #fcc-brand-options { max-height: 220px; }
+  .fcc-filter-done { display: block; width: 100%; margin-top: 16px; border-radius: 6px; }
+  .fcc-catalog-search { width: 100%; }
+}
 .fcc-catalog .fcc-catalog-card { background: transparent; border: 0; }
 .fcc-catalog .fcc-card-body { text-align: left; }
 @media (min-width: 1400px) {
