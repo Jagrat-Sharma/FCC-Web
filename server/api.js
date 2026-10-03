@@ -13,7 +13,6 @@ from './validation.js';
 import { downloadImage } from './image-import.js';
 import { catalogueImage } from '../catalogue-image-map.js';
 import { brandLogo } from './brand-logos.js';
-import { contact, enquiries } from './contact.js';
 const kinds = new Set(['products', 'gallery', 'blogs']);
 const nowSQL = "strftime('%Y-%m-%dT%H:%M:%fZ','now')";
 function idCheck(id) {
@@ -156,7 +155,6 @@ export async function handleAPI({
 }) {
   try {
     const url = new URL(request.url);
-    if (url.pathname === '/api/contact' || url.pathname === '/api/contact/config') return await contact(request, env);
     const parts = url.pathname.replace(/\/+$/, '').split('/').filter(Boolean).slice(1);
     const admin = parts[0] === 'admin';
     let user;
@@ -165,7 +163,6 @@ export async function handleAPI({
       user = await authenticate(request, env);
       if (!['GET', 'HEAD'].includes(request.method)) protectMutation(request, env);
     } else if (request.method !== 'GET') throw new HttpError(405, 'Public APIs are read-only.');
-    if (admin && parts[0] === 'enquiries') return await enquiries(request, env, parts);
     if (!env.DB || !env.IMAGES) throw new HttpError(503, 'The catalogue is not configured yet.');
     const [kind, id, action] = parts;
     if (!admin && kind === 'navigation' && parts.length === 1) {
