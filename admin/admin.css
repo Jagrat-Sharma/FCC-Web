@@ -385,3 +385,8 @@ body[data-view] .dashboard-sections { display: none; }
 
 .colour-row { border: 1px solid #cbd5e1; border-radius: 10px; padding: 16px; margin-bottom: 16px; }
 .colour-row img { width: 100px; height: 80px; object-fit: cover; }
+
+.enquiry-list { display: grid; gap: 1rem; }
+.enquiry-list article { padding: 1.5rem; border: 1px solid #d5dbe2; border-radius: 12px; background: #fff; overflow-wrap: anywhere; }
+.enquiry-message { white-space: pre-wrap; }
+.enquiry-list select { max-width: 20rem; }

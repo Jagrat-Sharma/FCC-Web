@@ -29,7 +29,7 @@ await mkdir(output, {
 });
 for (const name of files) await copyFile(resolve(root, name), resolve(output, name));
 await mkdir(resolve(output, 'admin'));
-for (const name of ['index.html', 'categories.html', 'product.html', 'admin.js', 'admin.css']) await copyFile(resolve(root, 'admin', name), resolve(output, 'admin', name));
+for (const name of ['index.html', 'categories.html', 'product.html', 'enquiries.html', 'enquiries.js', 'admin.js', 'admin.css']) await copyFile(resolve(root, 'admin', name), resolve(output, 'admin', name));
 async function copyAssets(source, target) {
   await mkdir(target, {
     recursive: true
@@ -48,7 +48,7 @@ async function copyAssets(source, target) {
 await copyAssets(resolve(root, 'assets'), resolve(output, 'assets'));
 // A changed script or stylesheet gets a new URL in the same deployment.
 // This prevents cached catalogue code from restoring the old anchor navigation.
-for (const name of [...files.filter(name => name.endsWith('.html')), 'admin/index.html', 'admin/categories.html', 'admin/product.html']) {
+for (const name of [...files.filter(name => name.endsWith('.html')), 'admin/index.html', 'admin/categories.html', 'admin/product.html', 'admin/enquiries.html']) {
   let html = await readFile(resolve(output, name), 'utf8');
   const references = [...html.matchAll(/(?:src|href)="([^"?]+\.(?:js|css|svg))(?:\?[^\"]*)?"/g)];
   for (const match of references) {

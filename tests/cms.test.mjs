@@ -47,6 +47,7 @@ function setup() {
   sql.exec(readFileSync(new URL('../migrations/0002_product_specifications.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../migrations/0003_blog.sql', import.meta.url), 'utf8'));
   sql.exec(readFileSync(new URL('../migrations/0006_product_colours.sql', import.meta.url), 'utf8'));
+  sql.exec(readFileSync(new URL('../migrations/0012_enquiries.sql', import.meta.url), 'utf8'));
   const DB = {
     prepare(query) {
       const statement = sql.prepare(query);
@@ -234,7 +235,7 @@ test('static deployment contains expected frontend files without server source o
   const files = await readdir(root);
   for (const file of ['index.html','products.html','gallery.html','catalogue.js','gallery.js','admin','_routes.json','404.html']) assert.ok(files.includes(file),file);
   for (const file of ['server','functions','migrations','wordpress','wordpress-ready','wrangler.toml','.git','.dev.vars','tests','README.md']) assert.ok(!files.includes(file),file);
-  assert.deepEqual((await readdir(new URL('admin/',root))).sort(),['admin.css','admin.js','categories.html','index.html','product.html']);
+  assert.deepEqual((await readdir(new URL('admin/',root))).sort(),['admin.css','admin.js','categories.html','enquiries.html','enquiries.js','index.html','product.html']);
   const products=await readFile(new URL('products.html',root),'utf8');
   assert.ok(!products.includes('data-name="Soft Sand"'));
   assert.match(products, /src="catalogue\.js\?v=[a-f0-9]{12}"/);
@@ -516,4 +517,80 @@ test('all migrations apply together without duplicating Strong Intuition', () =>
   sql.exec(readFileSync(new URL('0010_missing_product_images.sql', migrations), 'utf8'));
   assert.deepEqual(sql.prepare('SELECT id, colours, version FROM products ORDER BY id').all(), before);
   sql.close();
+});
+
+test('contact saves before notification, safely replays, retries email and protects admin enquiries', async () => {
+  const env = { ...setup(), TURNSTILE_SITE_KEY: 'public', TURNSTILE_SECRET_KEY: 'secret', RESEND_API_KEY: 'test', CONTACT_FROM_EMAIL: 'site@example.com', CONTACT_TO_EMAIL: 'owner@example.com' };
+  const originalFetch = globalThis.fetch;
+  let emailOK = false, emails = 0;
+  globalThis.fetch = async (url, options) => {
+    if (url.includes('siteverify')) return Response.json({ success: true, hostname: 'flooring.example', action: 'contact' });
+    if (url === 'https://api.resend.com/emails') {
+      emails++;
+      assert.equal(env.sql.prepare('SELECT count(*) AS n FROM enquiries').get().n, 1);
+      assert.equal(JSON.parse(options.body).reply_to, 'customer@example.com');
+      return Response.json({}, { status: emailOK ? 200 : 503 });
+    }
+    return originalFetch(url, options);
+  };
+  try {
+    const body = { id: crypto.randomUUID(), name: 'Customer', email: 'customer@example.com', phone: '', material: 'Hardwood', details: 'Two rooms need flooring.', token: 'test-token' };
+    const send = () => handleAPI({ env, request: req('/api/contact', 'POST', body, null, { 'CF-Connecting-IP': '192.0.2.1', Cookie: '__Host-fcc-contact=11111111-1111-4111-8111-111111111111' }) });
+    assert.equal((await send()).status, 201);
+    assert.equal(env.sql.prepare('SELECT notification_status FROM enquiries').get().notification_status, 'failed');
+    assert.equal((await send()).status, 200);
+    assert.equal(emails, 1);
+    assert.equal((await handleAPI({ env, request: req('/api/admin/enquiries', 'GET', undefined, null) })).status, 401);
+    const inbox = await handleAPI({ env, request: req('/api/admin/enquiries') });
+    assert.equal((await inbox.json()).items[0].details, body.details);
+    assert.equal((await handleAPI({ env, request: req('/api/admin/enquiries/' + body.id, 'PUT', { status: 'Contacted' }) })).status, 200);
+    assert.equal(env.sql.prepare('SELECT status FROM enquiries').get().status, 'Contacted');
+    assert.equal((await handleAPI({ env, request: req('/api/admin/enquiries/' + body.id, 'PUT', { status: 'Closed' }, valid, { Origin: 'https://other.example' }) })).status, 403);
+    emailOK = true;
+    await handleAPI({ env, request: req('/api/admin/enquiries/' + body.id + '/retry', 'POST') });
+    assert.equal(env.sql.prepare('SELECT notification_status FROM enquiries').get().notification_status, 'sent');
+    await handleAPI({ env, request: req('/api/admin/enquiries/' + body.id + '/retry', 'POST') });
+    assert.equal(emails, 2);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('contact rejects spam, invalid challenge and excess attempts without storing enquiries', async () => {
+  const env = { ...setup(), TURNSTILE_SITE_KEY: 'public', TURNSTILE_SECRET_KEY: 'secret' };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ success: true, hostname: 'wrong.example', action: 'contact' });
+  try {
+    const body = { id: crypto.randomUUID(), name: 'Customer', email: 'customer@example.com', material: 'Hardwood', details: 'Two rooms.', token: 'test-token' };
+    const send = (changes = {}, headers = {}) => handleAPI({ env, request: req('/api/contact', 'POST', { ...body, ...changes }, null, { 'CF-Connecting-IP': '192.0.2.2', Cookie: '__Host-fcc-contact=22222222-2222-4222-8222-222222222222', ...headers }) });
+    assert.equal((await send({ website: 'spam' })).status, 400);
+    assert.equal((await send({ email: 'invalid' })).status, 400);
+    assert.equal((await send({}, { Origin: 'https://other.example' })).status, 403);
+    for (let n = 0; n < 3; n++) assert.equal((await send()).status, 400);
+    assert.equal((await send()).status, 429);
+    assert.equal(env.sql.prepare('SELECT count(*) AS n FROM enquiries').get().n, 0);
+    const disabled = await handleAPI({ env: setup(), request: req('/api/contact/config', 'GET', undefined, null) });
+    assert.equal((await disabled.json()).enabled, false);
+  } finally { globalThis.fetch = originalFetch; }
+});
+
+test('contact cookie and global cap enforce limits and reopen after an hour', async () => {
+  const env = { ...setup(), TURNSTILE_SITE_KEY: 'public', TURNSTILE_SECRET_KEY: 'secret' };
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => Response.json({ success: true, hostname: 'flooring.example', action: 'contact' });
+  try {
+    const config = await handleAPI({ env, request: req('/api/contact/config', 'GET', undefined, null) });
+    const cookie = config.headers.get('set-cookie').split(';')[0];
+    assert.match(config.headers.get('set-cookie'), /HttpOnly; Secure; SameSite=Strict/);
+    const send = (ip, browser = cookie) => handleAPI({ env, request: req('/api/contact', 'POST', { id: crypto.randomUUID(), name: 'Visitor', email: 'visitor@example.com', material: 'Hardwood', details: 'A flooring project.', token: 'valid' }, null, { 'CF-Connecting-IP': ip, Cookie: browser }) });
+    for (let i = 0; i < 3; i++) assert.equal((await send('192.0.2.' + i)).status, 201);
+    assert.equal((await send('192.0.2.4')).status, 429, 'same cookie remains limited after changing IP');
+    assert.equal((await send('192.0.2.5', '')).status, 400, 'cookie required');
+    for (let i = 3; i < 30; i++) env.sql.prepare('INSERT INTO enquiries (id,name,email,material,details) VALUES (?,?,?,?,?)').run(crypto.randomUUID(), 'Visitor', 'v@example.com', 'Hardwood', 'Project');
+    const blocked = await send('192.0.2.6', '__Host-fcc-contact=' + crypto.randomUUID());
+    assert.equal(blocked.status, 429);
+    assert.match((await blocked.json()).error, /905-458-5555/);
+    const paused = await handleAPI({ env, request: req('/api/contact/config') });
+    assert.equal((await paused.json()).paused, true);
+    env.sql.exec("UPDATE enquiries SET created_at=strftime('%Y-%m-%dT%H:%M:%fZ','now','-61 minutes')");
+    assert.equal((await send('192.0.2.7', '__Host-fcc-contact=' + crypto.randomUUID())).status, 201);
+  } finally { globalThis.fetch = originalFetch; }
 });
