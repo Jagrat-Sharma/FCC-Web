@@ -2353,6 +2353,27 @@ html.fcc-popup-open {
   .fcc-catalog-search { width: 100%; }
 }
 
+/* Contained About sections keep the longer story comfortable to read. */
+.fcc-about-page { padding: clamp(16px, 3vw, 44px) 20px; }
+.fcc-about-page > .fcc-section { max-width: 1320px; margin: 0 auto 28px; padding: clamp(28px, 5vw, 64px); border-radius: 24px; }
+.fcc-about-process { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: start; }
+.fcc-about-process h2 { margin-bottom: 24px; }
+.fcc-about-process p { color: var(--muted); }
+.fcc-about-steps { list-style: none; counter-reset: visit; padding: 0; margin: 0; }
+.fcc-about-steps li { counter-increment: visit; position: relative; padding: 0 0 24px 46px; margin-bottom: 24px; border-bottom: 1px solid var(--line); }
+.fcc-about-steps li::before { content: '0' counter(visit); position: absolute; left: 0; top: 2px; color: var(--green); font: italic 22px Georgia, serif; }
+.fcc-about-steps h3 { margin-bottom: 10px; font-size: 21px; }
+.fcc-about-page .fcc-about-cards article { display: flex; flex-direction: column; }
+.fcc-about-page .fcc-about-cards .fcc-text-link { margin-top: auto; }
+.fcc-about-page .fcc-about-visit .fcc-button { margin-top: 24px; }
+@media (max-width: 850px) {
+  .fcc-about-process { grid-template-columns: 1fr; gap: 28px; }
+  .fcc-about-page .fcc-about-cards { grid-template-columns: 1fr; }
+}
+@media (max-width: 540px) {
+  .fcc-about-page { padding: 16px 12px; }
+  .fcc-about-page > .fcc-section { padding: 28px 20px; border-radius: 18px; }
+}
 /* Soft, photo-led About page with the brand colour reserved for accents. */
 .fcc-about-page {
   --cream: #faf7f2;
