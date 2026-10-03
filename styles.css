@@ -2026,6 +2026,61 @@ html.fcc-popup-open {
   line-height: 1.6;
 }
 
+/* Product textures introduce the flooring selection on the Services page. */
+.fcc-material-gallery { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.fcc-material-card { display: block; border: 1px solid var(--line); border-radius: 18px; overflow: hidden; background: #f3eee7; text-decoration: none; }
+.fcc-material-image { overflow: hidden; background: #e7dfd3; }
+.fcc-material-image img { width: 100%; height: auto; aspect-ratio: 4 / 3; object-fit: cover; display: block; transition: transform .25s ease; }
+.fcc-material-card:hover img { transform: scale(1.04); }
+.fcc-material-card:focus-visible { outline: 3px solid var(--green); outline-offset: 5px; }
+.fcc-material-copy { padding: 24px; }
+.fcc-material-copy h3 { display: flex; justify-content: space-between; align-items: center; font-size: 28px; margin: 12px 0; }
+.fcc-material-copy p { color: var(--muted); margin-bottom: 18px; }
+.fcc-material-copy small { display: block; font-size: 12px; color: var(--muted); }
+.fcc-material-more { display: grid; grid-template-columns: 1fr 1.3fr; gap: 32px; padding: 32px 0; margin-top: 24px; border-top: 1px solid var(--line); }
+.fcc-material-more h3 { font-size: 23px; margin-bottom: 12px; }
+.fcc-material-more p { color: var(--muted); }
+.fcc-material-links { display: flex; flex-wrap: wrap; gap: 10px; align-content: start; }
+.fcc-material-links a { display: inline-block; padding: 10px 16px; border: 1px solid var(--line); border-radius: 24px; font-size: 14px; }
+.fcc-material-links a:hover { background: #eee5dc; }
+@media (max-width: 850px) { .fcc-material-gallery { grid-template-columns: 1fr; } .fcc-material-more { grid-template-columns: 1fr; gap: 20px; } .fcc-material-image img { aspect-ratio: 16 / 9; } }
+@media (prefers-reduced-motion: reduce) { .fcc-material-image img { transition: none; } .fcc-material-card:hover img { transform: none; } }
+/* Services use a softer, contained layout with readable installation cards. */
+.fcc-services-page { --cream: #faf7f2; --ink: #443c38; --muted: #70645e; --green: #89515a; --line: #e5dcd4; background: var(--cream); padding: clamp(16px, 3vw, 44px) 20px; }
+.fcc-services-page > .fcc-section { max-width: 1320px; margin: 0 auto 28px; padding: clamp(28px, 5vw, 64px); border-radius: 24px; }
+.fcc-services-hero { display: grid; grid-template-columns: 1fr 1fr; align-items: center; gap: 48px; background: #f0e8e0; }
+.fcc-services-hero h1 { font-size: clamp(42px, 5vw, 70px); line-height: 1.08; }
+.fcc-services-hero p:not(.fcc-eyebrow) { margin: 24px 0; color: var(--muted); }
+.fcc-services-hero .fcc-text-link { display: block; margin-top: 20px; }
+.fcc-services-hero img { width: 100%; aspect-ratio: 6 / 5; height: auto; object-fit: cover; border-radius: 18px; }
+.fcc-services-hero figcaption { margin-top: 8px; font-size: 11px; color: var(--muted); }
+.fcc-services-intro { max-width: 65ch; color: var(--muted); margin: 24px 0 36px; }
+.fcc-services-page .fcc-service-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.fcc-services-page .fcc-service-grid article { background: #f3eee7; border: 1px solid var(--line); border-radius: 18px; display: flex; flex-direction: column; }
+.fcc-services-page .fcc-service-grid article { padding: 22px; }
+.fcc-services-page .fcc-service-grid h2 { font-size: 24px; line-height: 1.2; margin: 16px 0 12px; }
+.fcc-services-page .fcc-service-grid p { font-size: 14px; line-height: 1.65; margin-bottom: 18px; }
+.fcc-services-page .fcc-service-grid .fcc-eyebrow { font-size: 10px; }
+.fcc-services-page .fcc-service-grid .fcc-text-link { margin-top: auto; }
+.fcc-service-planning { background: #eeeae2; display: grid; grid-template-columns: 1fr 1fr; gap: 48px; }
+.fcc-service-planning p { color: var(--muted); margin: 16px 0; }
+.fcc-service-planning ol { margin: 0; padding-left: 24px; }
+.fcc-service-planning li { padding-left: 12px; margin-bottom: 24px; }
+.fcc-service-planning li::marker { color: var(--green); font-weight: bold; }
+.fcc-service-planning h3 { font-size: 21px; }
+.fcc-services-page .fcc-page-cta { background: #efe5e1; }
+.fcc-services-page .fcc-button { border-radius: 10px; }
+@media (max-width: 1100px) {
+  .fcc-services-page .fcc-service-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 850px) {
+  .fcc-services-hero, .fcc-service-planning { grid-template-columns: 1fr; gap: 28px; }
+}
+@media (max-width: 600px) {
+  .fcc-services-page { padding: 16px 12px; }
+  .fcc-services-page > .fcc-section { padding: 28px 20px; border-radius: 18px; }
+  .fcc-services-page .fcc-service-grid { grid-template-columns: 1fr; }
+}
 .fcc-service-grid {
   display:grid;
   grid-template-columns:repeat(3,minmax(0,1fr));
